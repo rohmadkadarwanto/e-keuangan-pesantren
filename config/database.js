@@ -4,11 +4,11 @@ exports.sequelize = void 0;
 const sequelize_1 = require("sequelize");
 const sequelize = new sequelize_1.Sequelize({
     dialect: 'mysql',
-    host: '127.0.0.1',
+    host: '0.0.0.0',
     port: 3306,
     username: 'root',
-    password: '',
-    database: 'db_trnsaksi_debit_kredit',
+    password: 'Delta@1988dsn',
+    database: 'e_pesantren_transaksi',
 });
 exports.sequelize = sequelize;
 // Test the database connection
