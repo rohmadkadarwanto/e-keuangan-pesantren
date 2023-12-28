@@ -2,9 +2,9 @@
   "name": "Pesntren Keuangan",
   "version": "1.0.0",
   "description": "Keuangan",
-  "main": "dist/app.js",
+  "main": "serverTransaksi.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node serverTransaksi.js"
   },
   "keywords": [
     "express",
