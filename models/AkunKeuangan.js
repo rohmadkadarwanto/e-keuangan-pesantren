@@ -13,14 +13,15 @@ class AkunKeuangan extends sequelize_1.Model {
     }
 }
 AkunKeuangan.init({
-    id_akun: {
-        type: sequelize_1.DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
+    /*id_akun: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },*/
     kode_akun: {
         type: sequelize_1.DataTypes.STRING,
         unique: true,
+        primaryKey: true,
     },
     kode_entitas: {
         type: sequelize_1.DataTypes.STRING,

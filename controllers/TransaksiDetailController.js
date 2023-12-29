@@ -35,6 +35,15 @@ router.get('/', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ error: error.message });
     }
 }));
+router.get('/:id', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const transaksiDetailList = yield TransaksiDetail_1.default.findByPk(_req.params.id);
+        res.status(200).json(transaksiDetailList);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}));
 // Update
 router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

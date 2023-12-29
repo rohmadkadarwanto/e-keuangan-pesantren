@@ -6,16 +6,26 @@ const database_1 = require("../config/database");
 class Entitas extends sequelize_1.Model {
 }
 Entitas.init({
-    id_entitas: {
-        type: sequelize_1.DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
     kode_entitas: {
         type: sequelize_1.DataTypes.STRING,
-        unique: true,
+        primaryKey: true,
     },
     nama_entitas: {
+        type: sequelize_1.DataTypes.STRING,
+    },
+    telp_entitas: {
+        type: sequelize_1.DataTypes.STRING,
+    },
+    alamat_entitas: {
+        type: sequelize_1.DataTypes.STRING,
+    },
+    email_entitas: {
+        type: sequelize_1.DataTypes.STRING,
+    },
+    tanggal_masuk_entitas: {
+        type: sequelize_1.DataTypes.DATE,
+    },
+    informasi_tambahan_entitas: {
         type: sequelize_1.DataTypes.STRING,
     },
     tipe_entitas: {

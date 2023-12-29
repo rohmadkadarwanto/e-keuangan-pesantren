@@ -14,12 +14,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const Santri_1 = __importDefault(require("../models/Santri"));
+const Entitas_1 = __importDefault(require("../models/Entitas"));
 const router = express_1.default.Router();
 // Create
 router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const santri = yield Santri_1.default.create(req.body);
-        res.status(201).json(santri);
+        const { nis, nama_santri, tanggal_masuk, informasi_tambahan_santri } = req.body;
+        // Membuat kode_entitas secara otomatis (contoh: EN20230101-123456)
+        const timestamp = new Date().toISOString().replace(/[^0-9]/g, '');
+        const kode_entitas = `EN${timestamp}`;
+        // Simpan data entitas ke tabel Entitas
+        yield Entitas_1.default.create({
+            kode_entitas,
+            nama_entitas: nama_santri,
+            tipe_entitas: 'santri', // Menggunakan nama_santri sebagai nama_entitas, sesuaikan dengan kebutuhan
+        });
+        // Simpan data santri ke tabel Santri
+        const santri = yield Santri_1.default.create({
+            nis,
+            kode_entitas,
+            nama_santri,
+            tanggal_masuk,
+            informasi_tambahan_santri,
+        });
+        res.status(201).json({ success: true, santri });
     }
     catch (error) {
         res.status(500).json({ error: error.message });

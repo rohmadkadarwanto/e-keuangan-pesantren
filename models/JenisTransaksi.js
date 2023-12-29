@@ -6,14 +6,15 @@ const database_1 = require("../config/database");
 class JenisTransaksi extends sequelize_1.Model {
 }
 JenisTransaksi.init({
-    id_jenis_transaksi: {
-        type: sequelize_1.DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
+    /*id_jenis_transaksi: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },*/
     kode_jenis_transaksi: {
         type: sequelize_1.DataTypes.STRING,
         unique: true,
+        primaryKey: true,
     },
     nama_jenis_transaksi: {
         type: sequelize_1.DataTypes.STRING,
