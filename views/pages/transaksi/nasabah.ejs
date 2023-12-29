@@ -24,114 +24,135 @@
   }
 </style>
 </head>
-<body>
+<body class="hold-transition sidebar-collapse">
+  <div class="wrapper">
 
-<div class="container mt-5">
-  <h2 class="mb-4">Data Nasabah</h2>
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <div class="container">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="/" class="nav-link">Nasabah</a>
+          </li>
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="/akun" class="nav-link">Akun</a>
+          </li>
+          <li class="nav-item d-none d-sm-inline-block">
+            <a href="/transaksi" class="nav-link">Transaksi</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
 
-  <!-- List Entitas -->
-  <div id="entitasList" class="card">
-    <div class="card-header">
-      <button class="btn btn-success" onclick="showNewEntitasForm()">Tambah Nasabah</button>
+
+
+  <div class="container mt-5">
+    <h2 class="mb-4">Data Nasabah</h2>
+
+    <!-- List Entitas -->
+    <div id="entitasList" class="card">
+      <div class="card-header">
+        <button class="btn btn-success" onclick="showNewEntitasForm()">Tambah Nasabah</button>
+      </div>
+      <div class="card-body">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama</th>
+              <th>Telp</th>
+              <th>Tanggal Masuk</th>
+              <th>Tipe Nasabah</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be loaded dynamically here -->
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div class="card-body">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Kode</th>
-            <th>Nama</th>
-            <th>Telp</th>
-            <th>Tanggal Masuk</th>
-            <th>Tipe Nasabah</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Data will be loaded dynamically here -->
-        </tbody>
-      </table>
+    <!-- Create/Edit Form -->
+    <div id="entitasForm" style="display: none;" class="card">
+      <div class="card-body">
+        <form data-toggle="validator">
+          <div class="form-group">
+            <label for="tipe_entitas">Tipe Nasabah:</label>
+            <!--input type="text" class="form-control" id="tipe_entitas" name="tipe_entitas" required-->
+            <select class="form-control" id="tipe_entitas" name="tipe_entitas" required data-error="Pilih tipe nasabah">
+
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="nama_entitas">Nama Nasabah:</label>
+            <input type="text" class="form-control" id="nama_entitas" name="nama_entitas" required data-error="Nama Nasabah harus diisi">
+          </div>
+          <div class="form-group">
+            <label for="telp_entitas">Telepon Nasabah:</label>
+            <input type="number" class="form-control" id="telp_entitas" name="telp_entitas" required data-error="Telepon Nasabah harus diisi">
+          </div>
+          <div class="form-group">
+            <label for="alamat_entitas">Alamat Nasabah:</label>
+            <input type="text" class="form-control" id="alamat_entitas" name="alamat_entitas" required data-error="Alamat Nasabah harus diisi">
+          </div>
+          <div class="form-group">
+            <label for="email_entitas">Email Nasabah:</label>
+            <input type="email" class="form-control" id="email_entitas" name="email_entitas" required data-error="Email Nasabah harus diisi" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan email yang valid">
+          </div>
+          <div class="form-group">
+            <label for="informasi_tambahan_entitas">Informasi Tambahan Nasabah:</label>
+            <textarea class="form-control" id="informasi_tambahan_entitas" name="informasi_tambahan_entitas" required data-error="Informasi Tambahan Nasabah harus diisi"></textarea>
+          </div>
+
+
+          <input type="hidden" id="kode_entitas" name="kode_entitas">
+
+
+
+          <!-- Form fields will be added dynamically here -->
+          <button type="button" class="btn btn-primary" onclick="saveEntitas()">Save</button>
+          <button type="button" class="btn btn-danger" onclick="cancelEntitasForm()">Cancel</button>
+        </form>
+      </div>
     </div>
+
+    <div id="entitasDetail" style="display: none;" class="card">
+      <div class="card-header">
+        <button class="btn btn-danger" onclick="cancelEntitasDetail()">Kembali</button>
+      </div>
+      <div class="card-body">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <strong>Kode Entitas:</strong> <span id="detail_kode_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Nama Nasabah:</strong> <span id="detail_nama_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Telepon Nasabah:</strong> <span id="detail_telp_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Alamat Nasabah:</strong> <span id="detail_alamat_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Email Nasabah:</strong> <span id="detail_email_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Informasi Tambahan Nasabah:</strong>
+            <p id="detail_informasi_tambahan_entitas">Loading</p>
+          </li>
+          <li class="list-group-item">
+            <strong>Tipe Nasabah:</strong> <span id="detail_tipe_entitas">Your Tipe Nasabah</span>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
   </div>
-  <!-- Create/Edit Form -->
-  <div id="entitasForm" style="display: none;" class="card">
-    <div class="card-body">
-      <form data-toggle="validator">
-        <div class="form-group">
-          <label for="tipe_entitas">Tipe Nasabah:</label>
-          <!--input type="text" class="form-control" id="tipe_entitas" name="tipe_entitas" required-->
-          <select class="form-control" id="tipe_entitas" name="tipe_entitas" required data-error="Pilih tipe nasabah">
-
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="nama_entitas">Nama Nasabah:</label>
-          <input type="text" class="form-control" id="nama_entitas" name="nama_entitas" required data-error="Nama Nasabah harus diisi">
-        </div>
-        <div class="form-group">
-          <label for="telp_entitas">Telepon Nasabah:</label>
-          <input type="number" class="form-control" id="telp_entitas" name="telp_entitas" required data-error="Telepon Nasabah harus diisi">
-        </div>
-        <div class="form-group">
-          <label for="alamat_entitas">Alamat Nasabah:</label>
-          <input type="text" class="form-control" id="alamat_entitas" name="alamat_entitas" required data-error="Alamat Nasabah harus diisi">
-        </div>
-        <div class="form-group">
-          <label for="email_entitas">Email Nasabah:</label>
-          <input type="email" class="form-control" id="email_entitas" name="email_entitas" required data-error="Email Nasabah harus diisi" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan email yang valid">
-        </div>
-        <div class="form-group">
-          <label for="informasi_tambahan_entitas">Informasi Tambahan Nasabah:</label>
-          <textarea class="form-control" id="informasi_tambahan_entitas" name="informasi_tambahan_entitas" required data-error="Informasi Tambahan Nasabah harus diisi"></textarea>
-        </div>
-
-
-        <input type="hidden" id="kode_entitas" name="kode_entitas">
-
-
-
-        <!-- Form fields will be added dynamically here -->
-        <button type="button" class="btn btn-primary" onclick="saveEntitas()">Save</button>
-        <button type="button" class="btn btn-danger" onclick="cancelEntitasForm()">Cancel</button>
-      </form>
-    </div>
   </div>
-
-  <div id="entitasDetail" style="display: none;" class="card">
-    <div class="card-header">
-      <button class="btn btn-danger" onclick="cancelEntitasDetail()">Kembali</button>
-    </div>
-    <div class="card-body">
-      <ul class="list-group">
-        <li class="list-group-item">
-          <strong>Kode Entitas:</strong> <span id="detail_kode_entitas">Loading</span>
-        </li>
-        <li class="list-group-item">
-          <strong>Nama Nasabah:</strong> <span id="detail_nama_entitas">Loading</span>
-        </li>
-        <li class="list-group-item">
-          <strong>Telepon Nasabah:</strong> <span id="detail_telp_entitas">Loading</span>
-        </li>
-        <li class="list-group-item">
-          <strong>Alamat Nasabah:</strong> <span id="detail_alamat_entitas">Loading</span>
-        </li>
-        <li class="list-group-item">
-          <strong>Email Nasabah:</strong> <span id="detail_email_entitas">Loading</span>
-        </li>
-        <li class="list-group-item">
-          <strong>Informasi Tambahan Nasabah:</strong>
-          <p id="detail_informasi_tambahan_entitas">Loading</p>
-        </li>
-        <li class="list-group-item">
-          <strong>Tipe Nasabah:</strong> <span id="detail_tipe_entitas">Your Tipe Nasabah</span>
-        </li>
-      </ul>
-
-    </div>
-  </div>
-
-</div>
-
 <!-- Bootstrap JS and dependencies -->
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -148,22 +169,10 @@
 
 <script>
 
-  const endpoint = "http://localhost:3000/api/entitas";
+  const endpoint = "/api/entitas";
 
   document.addEventListener('DOMContentLoaded', () => {
     fetchEntitasList();
-
-
-
-    // Fetch data from API
-    fetch('https://api.appschool.biz.id/api/entitas')
-        .then(response => response.json())
-        .then(data => {
-          alert(JSON.stringify(data))
-        })
-        .catch(error => console.error('Error fetching data:', error));
-
-
   });
 
 
