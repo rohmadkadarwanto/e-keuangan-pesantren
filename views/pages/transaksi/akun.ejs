@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Akun Keuangan</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- AdminLTE Styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1.0/dist/css/adminlte.min.css">
+  <!-- Your Custom Styles -->
+  <style>
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container mt-5">
+    <h2 class="mb-4">Data Akun Keuangan</h2>
+
+    <!-- List Akun Keuangan -->
+    <div id="akunList" class="card">
+      <div class="card-body">
+        <button class="btn btn-success mb-3" onclick="showNewAkunForm()">Tambah Akun</button>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Kode Akun</th>
+              <th>Kode Nasabah</th>
+              <th>Nama Akun</th>
+              <th>Saldo Awal</th>
+              <th>Tipe Transaksi</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be loaded dynamically here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Create/Edit Form -->
+    <div id="akunForm" style="display: none;" class="card">
+      <div class="card-body">
+        <form>
+          <div class="form-group">
+            <label for="kode_akun">Kode Akun:</label>
+            <input type="text" class="form-control" id="kode_akun" name="kode_akun" required>
+          </div>
+          <div class="form-group">
+            <label for="kode_entitas">Nasabah:</label>
+            <select class="form-control" id="kode_entitas" name="kode_entitas" required data-error="Pilih kode entitas">
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="nama_akun">Nama Akun:</label>
+            <input type="text" class="form-control" id="nama_akun" name="nama_akun" required>
+          </div>
+          <div class="form-group">
+            <label for="saldo_awal">Saldo Awal:</label>
+            <input type="text" class="form-control" id="saldo_awal" name="saldo_awal" required>
+          </div>
+          <div class="form-group">
+            <label for="tipe_transaksi">Tipe Transaksi:</label>
+            <select class="form-control" id="tipe_transaksi" name="tipe_transaksi" required data-error="Pilih tipe transaksi">
+            </select>
+          </div>
+
+
+          <input type="hidden" id="keykode_akun" name="keykode_akun">
+
+
+          <button type="button" class="btn btn-primary" onclick="saveAkun()">Save</button>
+          <button type="button" class="btn btn-danger" onclick="cancelAkunForm()">Cancel</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Detail Form -->
+    <div id="akunDetail" style="display: none;" class="card">
+      <div class="card-body">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <strong>Kode Akun:</strong> <span id="detail_kode_akun">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Nasabah:</strong> <span id="detail_kode_entitas">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Nama Akun:</strong> <span id="detail_nama_akun">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Saldo Awal:</strong> <span id="detail_saldo_awal">Loading</span>
+          </li>
+          <li class="list-group-item">
+            <strong>Tipe Transaksi:</strong> <span id="detail_tipe_transaksi">Loading</span>
+          </li>
+        </ul>
+        <button class="btn btn-success mt-3" onclick="cancelAkunDetail()">Kembali</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- AdminLTE JS -->
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1.0/dist/js/adminlte.min.js"></script>
+  <!-- ... (Your other scripts) ... -->
+  <!-- Tambahkan SweetAlert library -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+  <script>
+    const endpoint = "https://api.appschool.biz.id/api/akun_keuangan";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchAkunList();
+    });
+
+
+    const tipeTransaksiOptions = [
+      { value: "", text: "Pilih Tipe Transaksi", selected: true, disabled: true },
+      { value: "debit", text: "Debit" },
+      { value: "kredit", text: "Kredit" },
+    ];
+
+    async function fetchAkunList() {
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        displayAkunList(data);
+      } catch (error) {
+        console.error('Error fetching akun keuangan list:', error);
+      }
+    }
+
+
+    // Function to populate the Kode Entitas dropdown
+    function populateKodeEntitasDropdown(entitasList) {
+      const dropdown = document.getElementById("kode_entitas");
+
+      // Clear existing options
+      dropdown.innerHTML = "";
+
+      // Add a default option
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.text = "Pilih Kode Entitas";
+      defaultOption.selected = true;
+      defaultOption.disabled = true;
+      dropdown.appendChild(defaultOption);
+
+      // Add options from the entitasList
+      entitasList.forEach(entitas => {
+        const option = document.createElement("option");
+        option.value = entitas.kode_entitas;
+        option.text = entitas.kode_entitas;
+        dropdown.appendChild(option);
+      });
+
+    }
+
+
+
+    async function fetchEntitasDropdown() {
+      try {
+        const response = await fetch("https://api.appschool.biz.id/api/entitas");
+        const data = await response.json();
+        const dropdown = document.getElementById("kode_entitas");
+        // Clear existing options
+        dropdown.innerHTML = "";
+        tipeEntitasOptions = [
+          { value: "", text: "Pilih Nasabah", selected: true, disabled: true },
+          ...data.map(entitas => ({ value: entitas.kode_entitas, text: entitas.nama_entitas }))
+        ];
+
+        // Add options from the entitasList
+        tipeEntitasOptions.forEach(entitas => {
+          const option = document.createElement("option");
+          option.value = entitas.value;
+          option.text = entitas.text;
+          dropdown.appendChild(option);
+        });
+
+        //populateKodeEntitasDropdown(data);
+      } catch (error) {
+        console.error('Error fetching entitas dropdown:', error);
+      }
+    }
+
+    function displayAkunList(akunList) {
+      const tbody = document.querySelector('#akunList tbody');
+      tbody.innerHTML = '';
+
+      akunList.forEach(akun => {
+        const row = `
+          <tr>
+            <td>${akun.kode_akun}</td>
+            <td>${akun.kode_entitas}</td>
+            <td>${akun.nama_akun}</td>
+            <td>${akun.saldo_awal}</td>
+            <td>${getTipeTransaksiText(akun.tipe_transaksi)}</td>
+            <td>
+              <button class="btn btn-light btn-sm" onclick="detailAkun('${akun.kode_akun}')">Detail</button>
+              <button class="btn btn-info btn-sm" onclick="editAkun('${akun.kode_akun}')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteAkun('${akun.kode_akun}')">Delete</button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function showNewAkunForm() {
+      resetAkunForm();
+      showAkunForm();
+      fetchEntitasDropdown();
+      populateTipeTransaksiDropdown();
+
+
+      const timestamp = new Date().toISOString().replace(/[^0-9]/g, '');
+      const kode_akun = `REK${timestamp}`;
+
+      document.getElementById('kode_akun').value = kode_akun;
+
+    }
+
+    function resetAkunForm() {
+      const formElements = ['kode_akun', 'kode_entitas', 'nama_akun', 'saldo_awal', 'tipe_transaksi','keykode_akun'];
+      formElements.forEach(element => {
+        document.getElementById(element).value = '';
+      });
+    }
+
+    function showAkunForm() {
+      document.getElementById('akunForm').style.display = 'block';
+      document.getElementById('akunList').style.display = 'none';
+    }
+
+    function cancelAkunForm() {
+      document.getElementById('akunForm').style.display = 'none';
+      document.getElementById('akunList').style.display = 'block';
+    }
+
+    async function saveAkun() {
+      const loadingOverlay = showLoadingOverlay(); // Menampilkan overlay loading
+
+      try {
+        const formData = {
+          kode_akun: document.getElementById('kode_akun').value,
+          kode_entitas: document.getElementById('kode_entitas').value,
+          nama_akun: document.getElementById('nama_akun').value,
+          saldo_awal: document.getElementById('saldo_awal').value,
+          tipe_transaksi: document.getElementById('tipe_transaksi').value,
+        };
+
+        const akunId = document.getElementById('keykode_akun').value;
+
+        if (akunId) {
+          const response = await fetch(endpoint + `/${akunId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+          const data = await response.json();
+          console.log('Akun updated successfully:', data);
+          showAlert('success', 'Akun updated successfully');
+        } else {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+          });
+          const data = await response.json();
+          console.log('Akun created successfully:', data);
+          showAlert('success', 'Akun created successfully');
+        }
+
+        fetchAkunList();
+        cancelAkunForm();
+      } catch (error) {
+        console.error('Error saving akun:', error);
+        showAlert('error', 'Error saving akun');
+      } finally {
+        hideLoadingOverlay(loadingOverlay); // Menyembunyikan overlay loading
+      }
+    }
+
+
+    async function deleteAkun(id) {
+      if (await showConfirm('Are you sure you want to delete this akun?')) {
+        const loadingOverlay = showLoadingOverlay(); // Menampilkan overlay loading
+
+        try {
+          const response = await fetch(endpoint + `/${id}`, {
+            method: 'DELETE',
+          });
+          const data = await response.json();
+          console.log('Akun deleted successfully:', data);
+          //fetchAkunList();
+          showAlert('success', 'Akun deleted successfully');
+        } catch (error) {
+          console.error('Error deleting akun:', error);
+          showAlert('error', 'Error deleting akun');
+        } finally {
+          hideLoadingOverlay(loadingOverlay); // Menyembunyikan overlay loading
+          fetchAkunList();
+        }
+      }
+    }
+
+
+
+    function editAkun(id) {
+      fetch(`${endpoint}/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          populateAkunForm(data);
+          showAkunForm();
+        })
+        .catch(error => {
+          console.error('Error fetching akun details:', error);
+        });
+    }
+
+    function detailAkun(id) {
+      fetch(`${endpoint}/${id}`)
+        .then(response => response.json())
+        .then(data => {
+          showAkunDetail();
+          populateAkunDetail(data);
+        })
+        .catch(error => {
+          console.error('Error fetching akun details:', error);
+        });
+    }
+
+    function showAkunDetail() {
+      document.getElementById('akunDetail').style.display = 'block';
+      document.getElementById('akunList').style.display = 'none';
+    }
+
+    function cancelAkunDetail() {
+      document.getElementById('akunDetail').style.display = 'none';
+      document.getElementById('akunList').style.display = 'block';
+    }
+
+    function populateAkunForm(data) {
+      document.getElementById('kode_akun').value = data.kode_akun;
+      document.getElementById('kode_entitas').value = data.kode_entitas;
+      document.getElementById('nama_akun').value = data.nama_akun;
+      document.getElementById('saldo_awal').value = data.saldo_awal;
+
+      document.getElementById('keykode_akun').value = data.kode_akun;
+
+      populateTipeTransaksiDropdown();
+
+      const tipeTransaksiDropdown = document.getElementById('tipe_transaksi');
+      for (let i = 0; i < tipeTransaksiDropdown.options.length; i++) {
+        if (tipeTransaksiDropdown.options[i].value === data.tipe_transaksi) {
+          tipeTransaksiDropdown.options[i].selected = true;
+          break;
+        }
+      }
+
+
+      // Populate Kode Entitas Dropdown
+      const kodeEntitasDropdown = document.getElementById('kode_entitas');
+      for (let i = 0; i < kodeEntitasDropdown.options.length; i++) {
+        if (kodeEntitasDropdown.options[i].value === data.kode_entitas) {
+          kodeEntitasDropdown.options[i].selected = true;
+          break;
+        }
+      }
+
+    }
+
+    function populateAkunDetail(data) {
+      document.getElementById('detail_kode_akun').innerText = data.kode_akun;
+      document.getElementById('detail_kode_entitas').innerText = data.kode_entitas;
+      document.getElementById('detail_nama_akun').innerText = data.nama_akun;
+      document.getElementById('detail_saldo_awal').innerText = data.saldo_awal;
+      document.getElementById('detail_tipe_transaksi').innerText = getTipeTransaksiText(data.tipe_transaksi);
+    }
+
+
+    // Fungsi untuk mengambil teks berdasarkan nilai (value)
+    function getTipeTransaksiText(value) {
+      const option = tipeTransaksiOptions.find(option => option.value === value);
+      return option ? option.text : null;
+    }
+
+
+    function populateTipeTransaksiDropdown() {
+      const dropdown = document.getElementById("tipe_transaksi");
+
+      // Bersihkan opsi yang ada
+      dropdown.innerHTML = "";
+
+      // Tambahkan opsi baru dari array
+      tipeTransaksiOptions.forEach(option => {
+        const newOption = document.createElement("option");
+        newOption.value = option.value;
+        newOption.text = option.text;
+        newOption.selected = option.selected || false;
+        newOption.disabled = option.disabled || false;
+        dropdown.appendChild(newOption);
+      });
+    }
+
+
+    function showAlert(type, message) {
+      Swal.fire({
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+
+    async function showConfirm(message) {
+      const result = await Swal.fire({
+        icon: 'warning',
+        title: 'Confirmation',
+        text: message,
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+      });
+
+      return result.isConfirmed;
+    }
+
+    function showLoadingOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function hideLoadingOverlay(overlay) {
+    if (overlay) {
+      document.body.removeChild(overlay);
+    }
+  }
+
+  </script>
+
+</body>
+
+</html>

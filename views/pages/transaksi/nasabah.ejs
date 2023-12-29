@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Nasabah</title>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- AdminLTE Styles -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1.0/dist/css/adminlte.min.css">
+  <!-- Your Custom Styles -->
+  <style>
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+</style>
+</head>
+<body>
+
+<div class="container mt-5">
+  <h2 class="mb-4">Data Nasabah</h2>
+
+  <!-- List Entitas -->
+  <div id="entitasList" class="card">
+    <div class="card-header">
+      <button class="btn btn-success" onclick="showNewEntitasForm()">Tambah Nasabah</button>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Kode</th>
+            <th>Nama</th>
+            <th>Telp</th>
+            <th>Tanggal Masuk</th>
+            <th>Tipe Nasabah</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Data will be loaded dynamically here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- Create/Edit Form -->
+  <div id="entitasForm" style="display: none;" class="card">
+    <div class="card-body">
+      <form data-toggle="validator">
+        <div class="form-group">
+          <label for="tipe_entitas">Tipe Nasabah:</label>
+          <!--input type="text" class="form-control" id="tipe_entitas" name="tipe_entitas" required-->
+          <select class="form-control" id="tipe_entitas" name="tipe_entitas" required data-error="Pilih tipe nasabah">
+
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="nama_entitas">Nama Nasabah:</label>
+          <input type="text" class="form-control" id="nama_entitas" name="nama_entitas" required data-error="Nama Nasabah harus diisi">
+        </div>
+        <div class="form-group">
+          <label for="telp_entitas">Telepon Nasabah:</label>
+          <input type="number" class="form-control" id="telp_entitas" name="telp_entitas" required data-error="Telepon Nasabah harus diisi">
+        </div>
+        <div class="form-group">
+          <label for="alamat_entitas">Alamat Nasabah:</label>
+          <input type="text" class="form-control" id="alamat_entitas" name="alamat_entitas" required data-error="Alamat Nasabah harus diisi">
+        </div>
+        <div class="form-group">
+          <label for="email_entitas">Email Nasabah:</label>
+          <input type="email" class="form-control" id="email_entitas" name="email_entitas" required data-error="Email Nasabah harus diisi" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan email yang valid">
+        </div>
+        <div class="form-group">
+          <label for="informasi_tambahan_entitas">Informasi Tambahan Nasabah:</label>
+          <textarea class="form-control" id="informasi_tambahan_entitas" name="informasi_tambahan_entitas" required data-error="Informasi Tambahan Nasabah harus diisi"></textarea>
+        </div>
+
+
+        <input type="hidden" id="kode_entitas" name="kode_entitas">
+
+
+
+        <!-- Form fields will be added dynamically here -->
+        <button type="button" class="btn btn-primary" onclick="saveEntitas()">Save</button>
+        <button type="button" class="btn btn-danger" onclick="cancelEntitasForm()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="entitasDetail" style="display: none;" class="card">
+    <div class="card-header">
+      <button class="btn btn-danger" onclick="cancelEntitasDetail()">Kembali</button>
+    </div>
+    <div class="card-body">
+      <ul class="list-group">
+        <li class="list-group-item">
+          <strong>Kode Entitas:</strong> <span id="detail_kode_entitas">Loading</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Nama Nasabah:</strong> <span id="detail_nama_entitas">Loading</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Telepon Nasabah:</strong> <span id="detail_telp_entitas">Loading</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Alamat Nasabah:</strong> <span id="detail_alamat_entitas">Loading</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Email Nasabah:</strong> <span id="detail_email_entitas">Loading</span>
+        </li>
+        <li class="list-group-item">
+          <strong>Informasi Tambahan Nasabah:</strong>
+          <p id="detail_informasi_tambahan_entitas">Loading</p>
+        </li>
+        <li class="list-group-item">
+          <strong>Tipe Nasabah:</strong> <span id="detail_tipe_entitas">Your Tipe Nasabah</span>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!-- Bootstrap Validator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
+
+<!-- AdminLTE JS -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.1.0/dist/js/adminlte.min.js"></script>
+<!-- ... (Your other scripts) ... -->
+<!-- Tambahkan SweetAlert library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<!-- ... (HTML template) ... -->
+
+<script>
+
+  const endpoint = "http://localhost:3000/api/entitas";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchEntitasList();
+
+
+
+    // Fetch data from API
+    fetch('https://api.appschool.biz.id/api/entitas')
+        .then(response => response.json())
+        .then(data => {
+          alert(JSON.stringify(data))
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+
+  });
+
+
+  // Fungsi untuk mendapatkan judul dropdown berdasarkan nilai yang dipilih
+function getSelectedText(elementId) {
+  const selectElement = document.getElementById(elementId);
+  const selectedText = selectElement.options[selectElement.selectedIndex].text;
+  return selectedText;
+}
+
+  $(document).ready(function () {
+    $('form[data-toggle="validator"]').validator();
+  });
+  function showNewEntitasForm() {
+    resetEntitasForm();
+    showEntitasForm();
+    populateTipeEntitasDropdown();
+  }
+
+  function resetEntitasForm() {
+    const formElements = ['kode_entitas', 'nama_entitas', 'telp_entitas', 'alamat_entitas', 'email_entitas', 'informasi_tambahan_entitas', 'tipe_entitas'];
+    formElements.forEach(element => {
+      document.getElementById(element).value = '';
+    });
+  }
+
+  const tipeEntitasOptions = [
+    { value: "", text: "Pilih Tipe Nasabah", selected: true, disabled: true },
+    { value: "santri", text: "Santri" },
+    { value: "wali", text: "Wali Santri" },
+    { value: "perusahaan", text: "Perusahaan" },
+    { value: "nasabah", text: "Nasabah Umum" }
+  ];
+
+  // Fungsi untuk mengambil teks berdasarkan nilai (value)
+  function getTipeEntitasText(value) {
+    const option = tipeEntitasOptions.find(option => option.value === value);
+    return option ? option.text : null;
+  }
+
+  async function fetchEntitasList() {
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      displayEntitasList(data);
+    } catch (error) {
+      console.error('Error fetching entitas list:', error);
+    }
+  }
+
+  function displayEntitasList(entitasList) {
+    const tbody = document.querySelector('#entitasList tbody');
+    tbody.innerHTML = '';
+
+    entitasList.forEach(entitas => {
+      const row = `
+        <tr>
+          <td>${entitas.kode_entitas}</td>
+          <td>${entitas.nama_entitas}</td>
+          <td>${entitas.telp_entitas}</td>
+          <td>${entitas.tanggal_masuk_entitas}</td>
+          <td>${getTipeEntitasText(entitas.tipe_entitas)}</td>
+          <td>
+            <button class="btn btn-light btn-sm" onclick="detailEntitas('${entitas.kode_entitas}')">Detail</button>
+            <button class="btn btn-info btn-sm" onclick="editEntitas('${entitas.kode_entitas}')">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEntitas('${entitas.kode_entitas}')">Delete</button>
+          </td>
+        </tr>
+      `;
+      tbody.innerHTML += row;
+    });
+  }
+
+  function showEntitasForm() {
+    document.getElementById('entitasForm').style.display = 'block';
+    document.getElementById('entitasList').style.display = 'none';
+  }
+
+  function cancelEntitasForm() {
+    document.getElementById('entitasForm').style.display = 'none';
+    document.getElementById('entitasList').style.display = 'block';
+  }
+
+  function showEntitasDetail() {
+    document.getElementById('entitasDetail').style.display = 'block';
+    document.getElementById('entitasList').style.display = 'none';
+  }
+
+  function cancelEntitasDetail() {
+    document.getElementById('entitasDetail').style.display = 'none';
+    document.getElementById('entitasList').style.display = 'block';
+  }
+
+  function editEntitas(id) {
+    fetch(endpoint + `/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        populateEntitasForm(data);
+        showEntitasForm();
+      })
+      .catch(error => {
+        console.error('Error fetching entitas details:', error);
+      });
+  }
+
+  function detailEntitas(id) {
+    fetch(endpoint + `/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        showEntitasDetail();
+        populateEntitasDetail(data);
+      })
+      .catch(error => {
+        console.error('Error fetching entitas details:', error);
+      });
+  }
+
+  async function saveEntitas() {
+    const loadingOverlay = showLoadingOverlay(); // Menampilkan overlay loading
+
+    try {
+      const formData = {
+        kode_entitas: document.getElementById('kode_entitas').value,
+        nama_entitas: document.getElementById('nama_entitas').value,
+        telp_entitas: document.getElementById('telp_entitas').value,
+        alamat_entitas: document.getElementById('alamat_entitas').value,
+        email_entitas: document.getElementById('email_entitas').value,
+        informasi_tambahan_entitas: document.getElementById('informasi_tambahan_entitas').value,
+        tipe_entitas: document.getElementById('tipe_entitas').value,
+      };
+
+      const entitasId = document.getElementById('kode_entitas').value;
+
+      if (entitasId) {
+        const response = await fetch(endpoint + `/${entitasId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        const data = await response.json();
+        console.log('Entitas updated successfully:', data);
+        showAlert('success', 'Entitas updated successfully');
+      } else {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
+        const data = await response.json();
+        console.log('Entitas created successfully:', data);
+        showAlert('success', 'Entitas created successfully');
+      }
+
+      fetchEntitasList();
+      cancelEntitasForm();
+    } catch (error) {
+      console.error('Error saving entitas:', error);
+      showAlert('error', 'Error saving entitas');
+    } finally {
+      hideLoadingOverlay(loadingOverlay); // Menyembunyikan overlay loading
+    }
+  }
+
+  async function deleteEntitas(id) {
+    if (await showConfirm('Are you sure you want to delete this entitas?')) {
+      const loadingOverlay = showLoadingOverlay(); // Menampilkan overlay loading
+
+      try {
+        const response = await fetch(endpoint + `/${id}`, {
+          method: 'DELETE',
+        });
+        const data = await response.json();
+        console.log('Entitas deleted successfully:', data);
+        fetchEntitasList();
+        showAlert('success', 'Entitas deleted successfully');
+      } catch (error) {
+        console.error('Error deleting entitas:', error);
+        showAlert('error', 'Error deleting entitas');
+      } finally {
+        hideLoadingOverlay(loadingOverlay); // Menyembunyikan overlay loading
+      }
+    }
+  }
+
+  function showAlert(type, message) {
+    Swal.fire({
+      icon: type,
+      title: message,
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  }
+
+  async function showConfirm(message) {
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'Confirmation',
+      text: message,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    });
+
+    return result.isConfirmed;
+  }
+
+  function populateEntitasForm(data) {
+    document.getElementById('kode_entitas').value = data.kode_entitas;
+    document.getElementById('nama_entitas').value = data.nama_entitas;
+    document.getElementById('telp_entitas').value = data.telp_entitas;
+    document.getElementById('alamat_entitas').value = data.alamat_entitas;
+    document.getElementById('email_entitas').value = data.email_entitas;
+    document.getElementById('informasi_tambahan_entitas').value = data.informasi_tambahan_entitas;
+    populateTipeEntitasDropdown();
+    // Mendapatkan elemen dropdown tipe_entitas
+    const tipeEntitasDropdown = document.getElementById('tipe_entitas');
+
+    // Mengatur opsi yang sesuai sebagai selected
+    for (let i = 0; i < tipeEntitasDropdown.options.length; i++) {
+      if (tipeEntitasDropdown.options[i].value === data.tipe_entitas) {
+        tipeEntitasDropdown.options[i].selected = true;
+        break;
+      }
+    }
+  }
+
+  function populateTipeEntitasDropdown() {
+    const dropdown = document.getElementById("tipe_entitas");
+
+    // Bersihkan opsi yang ada
+    dropdown.innerHTML = "";
+
+    // Tambahkan opsi baru dari array
+    tipeEntitasOptions.forEach(option => {
+      const newOption = document.createElement("option");
+      newOption.value = option.value;
+      newOption.text = option.text;
+      newOption.selected = option.selected || false;
+      newOption.disabled = option.disabled || false;
+      dropdown.appendChild(newOption);
+    });
+  }
+
+
+  function populateEntitasDetail(data) {
+    document.getElementById('detail_kode_entitas').innerText = data.kode_entitas;
+    document.getElementById('detail_nama_entitas').innerText = data.nama_entitas;
+    document.getElementById('detail_telp_entitas').innerText = data.telp_entitas;
+    document.getElementById('detail_alamat_entitas').innerText = data.alamat_entitas;
+    document.getElementById('detail_email_entitas').innerText = data.email_entitas;
+    document.getElementById('detail_informasi_tambahan_entitas').innerText = data.informasi_tambahan_entitas;
+    document.getElementById('detail_tipe_entitas').innerText = getTipeEntitasText(data.tipe_entitas);
+  }
+
+
+  function showLoadingOverlay() {
+  const overlay = document.createElement('div');
+  overlay.className = 'loading-overlay';
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function hideLoadingOverlay(overlay) {
+  if (overlay) {
+    document.body.removeChild(overlay);
+  }
+}
+
+</script>
+
+<!-- ... (HTML template) ... -->
+
+</body>
+</html>

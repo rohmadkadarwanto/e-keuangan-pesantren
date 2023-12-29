@@ -15,12 +15,17 @@ const TransaksiDetailRoutes_1 = __importDefault(require("./routes/TransaksiDetai
 const SantriRoutes_1 = __importDefault(require("./routes/SantriRoutes"));
 const WaliSantriRoutes_1 = __importDefault(require("./routes/WaliSantriRoutes"));
 const NeracaRoutes_1 = __importDefault(require("./routes/NeracaRoutes"));
+const transaksi_1 = __importDefault(require("./routes/transaksi"));
 const app = (0, express_1.default)();
 const port = 3000;
 // Middleware and other configurations
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)());
+app.set('view engine', 'ejs');
+// Static files
+app.use(express_1.default.static('public'));
+app.use('/', transaksi_1.default);
 // Routes
 app.use('/api', EntitasRoutes_1.default);
 app.use('/api', JenisTransaksiRoutes_1.default);
