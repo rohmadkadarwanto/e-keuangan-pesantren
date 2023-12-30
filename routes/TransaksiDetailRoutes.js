@@ -1,10 +1,1 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const TransaksiDetailController_1 = __importDefault(require("../controllers/TransaksiDetailController"));
-const router = express_1.default.Router();
-router.use('/transaksi_detail', TransaksiDetailController_1.default);
-exports.default = router;
+"use strict";var __importDefault=this&&this.__importDefault||function(e){return e&&e.__esModule?e:{default:e}};Object.defineProperty(exports,"__esModule",{value:!0});const express_1=__importDefault(require("express")),TransaksiDetailController_1=__importDefault(require("../controllers/TransaksiDetailController")),router=express_1.default.Router();router.post("/",TransaksiDetailController_1.default.createTransaksiDetail),router.get("/",TransaksiDetailController_1.default.getTransaksiDetailList),router.get("/:id",TransaksiDetailController_1.default.getTransaksiDetailById),router.put("/:id",TransaksiDetailController_1.default.updateTransaksiDetail),router.delete("/:id",TransaksiDetailController_1.default.deleteTransaksiDetail),exports.default=router;
