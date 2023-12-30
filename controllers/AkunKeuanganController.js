@@ -1,1 +1,211 @@
-"use strict";var __awaiter=this&&this.__awaiter||function(a,n,t,e){return new(t||(t=Promise))(function(s,u){function i(a){try{o(e.next(a))}catch(n){u(n)}}function r(a){try{o(e.throw(a))}catch(n){u(n)}}function o(a){var n;a.done?s(a.value):((n=a.value)instanceof t?n:new t(function(a){a(n)})).then(i,r)}o((e=e.apply(a,n||[])).next())})},__importDefault=this&&this.__importDefault||function(a){return a&&a.__esModule?a:{default:a}};Object.defineProperty(exports,"__esModule",{value:!0});const database_1=__importDefault(require("../config/database")),AkunKeuangan_1=__importDefault(require("../models/AkunKeuangan")),TransaksiDetail_1=__importDefault(require("../models/TransaksiDetail"));function getDetailSaldoAkun(a,n){return __awaiter(this,void 0,void 0,function*(){try{let t=yield AkunKeuangan_1.default.findOne({attributes:["tipe_transaksi",[database_1.default.literal("AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'kredit' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'debit' THEN TransaksiDetails.jumlah ELSE 0 END), 0)"),"saldo",],],include:[{model:TransaksiDetail_1.default,attributes:[],required:!1},],where:{kode_akun:a.params.kodeAkun},group:["AkunKeuangan.kode_akun","AkunKeuangan.nama_akun","AkunKeuangan.tipe_transaksi","AkunKeuangan.saldo_awal"]});n.status(200).json(t)}catch(e){n.status(500).json({error:e.message})}})}function createAkunKeuangan(a,n){return __awaiter(this,void 0,void 0,function*(){try{let{kode_akun:t,kode_entitas:e,nama_akun:s,saldo_awal:u,tipe_transaksi:i}=a.body,r=yield AkunKeuangan_1.default.create({kode_akun:t,kode_entitas:e,nama_akun:s,saldo_awal:u,tipe_transaksi:i});n.status(201).json(r)}catch(o){n.status(500).json({error:o.message})}})}function getAkunKeuanganList(a,n){return __awaiter(this,void 0,void 0,function*(){try{let a=yield AkunKeuangan_1.default.findAll({attributes:["id_akun","kode_akun","nama_akun","kode_entitas","saldo_awal","tipe_transaksi",[database_1.default.literal("AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'kredit' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'debit' THEN TransaksiDetails.jumlah ELSE 0 END), 0)"),"saldo",],],include:[{model:TransaksiDetail_1.default,attributes:["kode_jenis_transaksi","tanggal_transaksi"],required:!1},],group:["AkunKeuangan.kode_akun","AkunKeuangan.nama_akun","AkunKeuangan.tipe_transaksi","AkunKeuangan.saldo_awal"]});n.status(200).json(a)}catch(t){n.status(500).json({error:t.message})}})}function getAkunKeuanganById(a,n){return __awaiter(this,void 0,void 0,function*(){try{let t=yield AkunKeuangan_1.default.findByPk(a.params.id);n.status(200).json(t)}catch(e){n.status(500).json({error:e.message})}})}function getAkunKeuanganByAkun(a,n){return __awaiter(this,void 0,void 0,function*(){try{let t=yield AkunKeuangan_1.default.findOne({attributes:["id_akun","kode_akun","nama_akun","kode_entitas","saldo_awal","tipe_transaksi",[database_1.default.literal("AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'kredit' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = 'debit' THEN TransaksiDetails.jumlah ELSE 0 END), 0)"),"saldo",],],include:[{model:TransaksiDetail_1.default,attributes:[],required:!1},],where:{kode_akun:a.params.kodeAkun},group:["AkunKeuangan.kode_akun","AkunKeuangan.nama_akun","AkunKeuangan.tipe_transaksi","AkunKeuangan.saldo_awal"]});n.status(200).json(t)}catch(e){n.status(500).json({error:e.message})}})}function getAkunKeuanganByEntitas(a,n){return __awaiter(this,void 0,void 0,function*(){try{let t=yield AkunKeuangan_1.default.findAll({where:{kode_entitas:a.params.kodeEntitas}});n.status(200).json(t)}catch(e){n.status(500).json({error:e.message})}})}function updateAkunKeuangan(a,n){return __awaiter(this,void 0,void 0,function*(){try{let{kode_entitas:t,nama_akun:e,saldo_awal:s,tipe_transaksi:u}=a.body,i=yield AkunKeuangan_1.default.findByPk(a.params.id);i?(yield i.update({kode_entitas:t,nama_akun:e,saldo_awal:s,tipe_transaksi:u}),n.status(200).json(i)):n.status(404).json({error:"Financial account not found"})}catch(r){n.status(500).json({error:r.message})}})}function deleteAkunKeuangan(a,n){return __awaiter(this,void 0,void 0,function*(){try{let t=yield AkunKeuangan_1.default.findByPk(a.params.id);t?(yield t.destroy(),n.status(200).json({message:"Success"})):n.status(404).json({error:"Financial account not found"})}catch(e){n.status(500).json({error:e.message})}})}exports.default={getDetailSaldoAkun,createAkunKeuangan,getAkunKeuanganList,getAkunKeuanganById,getAkunKeuanganByAkun,getAkunKeuanganByEntitas,updateAkunKeuangan,deleteAkunKeuangan};
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const database_1 = __importDefault(require("../config/database"));
+const AkunKeuangan_1 = __importDefault(require("../models/AkunKeuangan"));
+const TransaksiDetail_1 = __importDefault(require("../models/TransaksiDetail"));
+function getDetailSaldoAkun(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const DetailSaldoAkun = yield AkunKeuangan_1.default.findOne({
+                attributes: [
+                    'tipe_transaksi',
+                    [
+                        database_1.default.literal('AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'kredit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'debit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'saldo',
+                    ],
+                ],
+                include: [
+                    {
+                        model: TransaksiDetail_1.default,
+                        attributes: [],
+                        required: false,
+                    },
+                ],
+                where: {
+                    kode_akun: req.params.kodeAkun,
+                },
+                group: ['AkunKeuangan.kode_akun', 'AkunKeuangan.nama_akun', 'AkunKeuangan.tipe_transaksi', 'AkunKeuangan.saldo_awal'],
+            });
+            res.status(200).json(DetailSaldoAkun);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function createAkunKeuangan(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_akun, kode_entitas, nama_akun, saldo_awal, tipe_transaksi } = req.body;
+            const akunKeuangan = yield AkunKeuangan_1.default.create({
+                kode_akun,
+                kode_entitas,
+                nama_akun,
+                saldo_awal,
+                tipe_transaksi,
+            });
+            res.status(201).json(akunKeuangan);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getAkunKeuanganList(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const DetailSaldoAkun = yield AkunKeuangan_1.default.findAll({
+                attributes: [
+                    'id_akun',
+                    'kode_akun',
+                    'nama_akun',
+                    'kode_entitas',
+                    'saldo_awal',
+                    'tipe_transaksi',
+                    [
+                        database_1.default.literal('AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'kredit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'debit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'saldo',
+                    ],
+                ],
+                include: [
+                    {
+                        model: TransaksiDetail_1.default,
+                        attributes: [
+                            'kode_jenis_transaksi',
+                            'tanggal_transaksi'
+                        ],
+                        required: false,
+                    },
+                ],
+                group: ['AkunKeuangan.kode_akun', 'AkunKeuangan.nama_akun', 'AkunKeuangan.tipe_transaksi', 'AkunKeuangan.saldo_awal'],
+            });
+            res.status(200).json(DetailSaldoAkun);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getAkunKeuanganById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const akunKeuangan = yield AkunKeuangan_1.default.findByPk(req.params.id);
+            res.status(200).json(akunKeuangan);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getAkunKeuanganByAkun(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const DetailSaldoAkun = yield AkunKeuangan_1.default.findOne({
+                attributes: [
+                    'id_akun',
+                    'kode_akun',
+                    'nama_akun',
+                    'kode_entitas',
+                    'saldo_awal',
+                    'tipe_transaksi',
+                    [
+                        database_1.default.literal('AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'kredit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'debit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'saldo',
+                    ],
+                ],
+                include: [
+                    {
+                        model: TransaksiDetail_1.default,
+                        attributes: [],
+                        required: false,
+                    },
+                ],
+                where: {
+                    kode_akun: req.params.kodeAkun,
+                },
+                group: ['AkunKeuangan.kode_akun', 'AkunKeuangan.nama_akun', 'AkunKeuangan.tipe_transaksi', 'AkunKeuangan.saldo_awal'],
+            });
+            res.status(200).json(DetailSaldoAkun);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getAkunKeuanganByEntitas(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const akunKeuangan = yield AkunKeuangan_1.default.findAll({
+                where: {
+                    kode_entitas: req.params.kodeEntitas,
+                },
+            });
+            res.status(200).json(akunKeuangan);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function updateAkunKeuangan(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_entitas, nama_akun, saldo_awal, tipe_transaksi } = req.body;
+            const akunKeuangan = yield AkunKeuangan_1.default.findByPk(req.params.id);
+            if (akunKeuangan) {
+                yield akunKeuangan.update({
+                    kode_entitas,
+                    nama_akun,
+                    saldo_awal,
+                    tipe_transaksi,
+                });
+                res.status(200).json(akunKeuangan);
+            }
+            else {
+                res.status(404).json({ error: 'Financial account not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function deleteAkunKeuangan(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const akunKeuangan = yield AkunKeuangan_1.default.findByPk(req.params.id);
+            if (akunKeuangan) {
+                yield akunKeuangan.destroy();
+                res.status(200).json({ message: 'Success' });
+            }
+            else {
+                res.status(404).json({ error: 'Financial account not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+exports.default = {
+    getDetailSaldoAkun,
+    createAkunKeuangan,
+    getAkunKeuanganList,
+    getAkunKeuanganById,
+    getAkunKeuanganByAkun,
+    getAkunKeuanganByEntitas,
+    updateAkunKeuangan,
+    deleteAkunKeuangan,
+};

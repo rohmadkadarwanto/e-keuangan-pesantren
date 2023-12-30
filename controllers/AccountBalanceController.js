@@ -1,4 +1,23 @@
-"use strict";var __awaiter=this&&this.__awaiter||function(a,t,n,e){return new(n||(n=Promise))(function(s,u){function i(a){try{o(e.next(a))}catch(t){u(t)}}function d(a){try{o(e.throw(a))}catch(t){u(t)}}function o(a){var t;a.done?s(a.value):((t=a.value)instanceof n?t:new n(function(a){a(t)})).then(i,d)}o((e=e.apply(a,t||[])).next())})},__importDefault=this&&this.__importDefault||function(a){return a&&a.__esModule?a:{default:a}};Object.defineProperty(exports,"__esModule",{value:!0});const database_1=__importDefault(require("../config/database"));function getAccountBalances(a,t){return __awaiter(this,void 0,void 0,function*(){try{let a=yield database_1.default.query(`
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+// src/controllers/AccountBalanceController.ts
+const database_1 = __importDefault(require("../config/database"));
+function getAccountBalances(_req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = yield database_1.default.query(`
     SELECT
       a.kode_akun,
       a.nama_akun,
@@ -13,7 +32,26 @@
       a.kode_akun = :kode_akun
     GROUP BY
       a.kode_akun, a.nama_akun, a.tipe_transaksi, a.saldo_awal;
-    `),n=a.map(a=>({kode_akun:a.kode_akun,nama_akun:a.nama_akun,tipe_transaksi:a.tipe_transaksi,saldo:a.saldo}));t.status(200).json({accountBalances:n})}catch(e){t.status(500).json({error:e.message})}})}function getAccountBalancesByCode(a,t){return __awaiter(this,void 0,void 0,function*(){try{let{kode_akun:n}=a.params,e=yield database_1.default.query(`
+    `);
+            // Cast the result to the desired type
+            const accountBalances = result.map((row) => ({
+                kode_akun: row.kode_akun,
+                nama_akun: row.nama_akun,
+                tipe_transaksi: row.tipe_transaksi,
+                saldo: row.saldo,
+            }));
+            res.status(200).json({ accountBalances });
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getAccountBalancesByCode(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_akun } = req.params;
+            const result = yield database_1.default.query(`
       SELECT
         a.kode_akun,
         a.nama_akun,
@@ -28,4 +66,24 @@
         a.kode_akun = :kode_akun
       GROUP BY
         a.kode_akun, a.nama_akun, a.tipe_transaksi, a.saldo_awal;
-      `,{replacements:{kode_akun:n}}),s=e.map(a=>({kode_akun:a.kode_akun,nama_akun:a.nama_akun,tipe_transaksi:a.tipe_transaksi,saldo:a.saldo}));t.status(200).json({accountBalances:s})}catch(u){t.status(500).json({error:u.message})}})}exports.default={getAccountBalances,getAccountBalancesByCode};
+      `, {
+                replacements: { kode_akun },
+            });
+            // Cast the result to the desired type
+            const accountBalances = result.map((row) => ({
+                kode_akun: row.kode_akun,
+                nama_akun: row.nama_akun,
+                tipe_transaksi: row.tipe_transaksi,
+                saldo: row.saldo,
+            }));
+            res.status(200).json({ accountBalances });
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+exports.default = {
+    getAccountBalances,
+    getAccountBalancesByCode,
+};

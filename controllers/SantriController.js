@@ -1,1 +1,102 @@
-"use strict";var __awaiter=this&&this.__awaiter||function(t,e,n,a){return new(n||(n=Promise))(function(i,r){function s(t){try{u(a.next(t))}catch(e){r(e)}}function o(t){try{u(a.throw(t))}catch(e){r(e)}}function u(t){var e;t.done?i(t.value):((e=t.value)instanceof n?e:new n(function(t){t(e)})).then(s,o)}u((a=a.apply(t,e||[])).next())})},__importDefault=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(exports,"__esModule",{value:!0});const Santri_1=__importDefault(require("../models/Santri"));function createSantri(t,e){return __awaiter(this,void 0,void 0,function*(){try{let{nis:n,kode_entitas:a,nama_santri:i,tanggal_masuk:r,informasi_tambahan_santri:s}=t.body,o=yield Santri_1.default.create({nis:n,kode_entitas:a,nama_santri:i,tanggal_masuk:r,informasi_tambahan_santri:s});e.status(201).json(o)}catch(u){e.status(500).json({error:u.message})}})}function getSantriList(t,e){return __awaiter(this,void 0,void 0,function*(){try{let t=yield Santri_1.default.findAll();e.status(200).json(t)}catch(n){e.status(500).json({error:n.message})}})}function getSantriByNIS(t,e){return __awaiter(this,void 0,void 0,function*(){try{let n=yield Santri_1.default.findByPk(t.params.nis);e.status(200).json(n)}catch(a){e.status(500).json({error:a.message})}})}function updateSantri(t,e){return __awaiter(this,void 0,void 0,function*(){try{let{kode_entitas:n,nama_santri:a,tanggal_masuk:i,informasi_tambahan_santri:r}=t.body,s=yield Santri_1.default.findByPk(t.params.nis);s?(yield s.update({kode_entitas:n,nama_santri:a,tanggal_masuk:i,informasi_tambahan_santri:r}),e.status(200).json(s)):e.status(404).json({error:"Santri not found"})}catch(o){e.status(500).json({error:o.message})}})}function deleteSantri(t,e){return __awaiter(this,void 0,void 0,function*(){try{let n=yield Santri_1.default.findByPk(t.params.nis);n?(yield n.destroy(),e.status(200).json({message:"Santri deleted successfully"})):e.status(404).json({error:"Santri not found"})}catch(a){e.status(500).json({error:a.message})}})}exports.default={createSantri,getSantriList,getSantriByNIS,updateSantri,deleteSantri};
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Santri_1 = __importDefault(require("../models/Santri"));
+function createSantri(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { nis, kode_entitas, nama_santri, tanggal_masuk, informasi_tambahan_santri } = req.body;
+            const santri = yield Santri_1.default.create({
+                nis,
+                kode_entitas,
+                nama_santri,
+                tanggal_masuk,
+                informasi_tambahan_santri,
+            });
+            res.status(201).json(santri);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getSantriList(_req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const santriList = yield Santri_1.default.findAll();
+            res.status(200).json(santriList);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getSantriByNIS(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const santri = yield Santri_1.default.findByPk(req.params.nis);
+            res.status(200).json(santri);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function updateSantri(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_entitas, nama_santri, tanggal_masuk, informasi_tambahan_santri } = req.body;
+            const santri = yield Santri_1.default.findByPk(req.params.nis);
+            if (santri) {
+                yield santri.update({
+                    kode_entitas,
+                    nama_santri,
+                    tanggal_masuk,
+                    informasi_tambahan_santri,
+                });
+                res.status(200).json(santri);
+            }
+            else {
+                res.status(404).json({ error: 'Santri not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function deleteSantri(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const santri = yield Santri_1.default.findByPk(req.params.nis);
+            if (santri) {
+                yield santri.destroy();
+                res.status(200).json({ message: 'Santri deleted successfully' });
+            }
+            else {
+                res.status(404).json({ error: 'Santri not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+exports.default = {
+    createSantri,
+    getSantriList,
+    getSantriByNIS,
+    updateSantri,
+    deleteSantri,
+};

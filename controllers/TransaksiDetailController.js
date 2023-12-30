@@ -1,1 +1,106 @@
-"use strict";var __awaiter=this&&this.__awaiter||function(t,a,e,s){return new(e||(e=Promise))(function(i,n){function r(t){try{u(s.next(t))}catch(a){n(a)}}function o(t){try{u(s.throw(t))}catch(a){n(a)}}function u(t){var a;t.done?i(t.value):((a=t.value)instanceof e?a:new e(function(t){t(a)})).then(r,o)}u((s=s.apply(t,a||[])).next())})},__importDefault=this&&this.__importDefault||function(t){return t&&t.__esModule?t:{default:t}};Object.defineProperty(exports,"__esModule",{value:!0});const TransaksiDetail_1=__importDefault(require("../models/TransaksiDetail"));function createTransaksiDetail(t,a){return __awaiter(this,void 0,void 0,function*(){try{let{kode_transaksi_detail:e,kode_transaksi:s,kode_akun:i,kode_jenis_transaksi:n,tipe_transaksi:r,jumlah:o,tanggal_transaksi:u}=t.body,l=yield TransaksiDetail_1.default.create({kode_transaksi_detail:e,kode_transaksi:s,kode_akun:i,kode_jenis_transaksi:n,tipe_transaksi:r,jumlah:o,tanggal_transaksi:u});a.status(201).json(l)}catch(d){a.status(500).json({error:d.message})}})}function getTransaksiDetailList(t,a){return __awaiter(this,void 0,void 0,function*(){try{let t=yield TransaksiDetail_1.default.findAll();a.status(200).json(t)}catch(e){a.status(500).json({error:e.message})}})}function getTransaksiDetailById(t,a){return __awaiter(this,void 0,void 0,function*(){try{let e=yield TransaksiDetail_1.default.findByPk(t.params.id);a.status(200).json(e)}catch(s){a.status(500).json({error:s.message})}})}function updateTransaksiDetail(t,a){return __awaiter(this,void 0,void 0,function*(){try{let{kode_transaksi:e,kode_akun:s,kode_jenis_transaksi:i,tipe_transaksi:n,jumlah:r,tanggal_transaksi:o}=t.body,u=yield TransaksiDetail_1.default.findByPk(t.params.id);u?(yield u.update({kode_transaksi:e,kode_akun:s,kode_jenis_transaksi:i,tipe_transaksi:n,jumlah:r,tanggal_transaksi:o}),a.status(200).json(u)):a.status(404).json({error:"Transaction detail not found"})}catch(l){a.status(500).json({error:l.message})}})}function deleteTransaksiDetail(t,a){return __awaiter(this,void 0,void 0,function*(){try{let e=yield TransaksiDetail_1.default.findByPk(t.params.id);e?(yield e.destroy(),a.status(200).json({message:"Transaction detail deleted successfully"})):a.status(404).json({error:"Transaction detail not found"})}catch(s){a.status(500).json({error:s.message})}})}exports.default={createTransaksiDetail,getTransaksiDetailList,getTransaksiDetailById,updateTransaksiDetail,deleteTransaksiDetail};
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const TransaksiDetail_1 = __importDefault(require("../models/TransaksiDetail"));
+function createTransaksiDetail(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_transaksi_detail, kode_transaksi, kode_akun, kode_jenis_transaksi, tipe_transaksi, jumlah, tanggal_transaksi, } = req.body;
+            const transaksiDetail = yield TransaksiDetail_1.default.create({
+                kode_transaksi_detail,
+                kode_transaksi,
+                kode_akun,
+                kode_jenis_transaksi,
+                tipe_transaksi,
+                jumlah,
+                tanggal_transaksi,
+            });
+            res.status(201).json(transaksiDetail);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getTransaksiDetailList(_req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const transaksiDetailList = yield TransaksiDetail_1.default.findAll();
+            res.status(200).json(transaksiDetailList);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getTransaksiDetailById(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const transaksiDetail = yield TransaksiDetail_1.default.findByPk(req.params.id);
+            res.status(200).json(transaksiDetail);
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function updateTransaksiDetail(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const { kode_transaksi, kode_akun, kode_jenis_transaksi, tipe_transaksi, jumlah, tanggal_transaksi, } = req.body;
+            const transaksiDetail = yield TransaksiDetail_1.default.findByPk(req.params.id);
+            if (transaksiDetail) {
+                yield transaksiDetail.update({
+                    kode_transaksi,
+                    kode_akun,
+                    kode_jenis_transaksi,
+                    tipe_transaksi,
+                    jumlah,
+                    tanggal_transaksi,
+                });
+                res.status(200).json(transaksiDetail);
+            }
+            else {
+                res.status(404).json({ error: 'Transaction detail not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+function deleteTransaksiDetail(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const transaksiDetail = yield TransaksiDetail_1.default.findByPk(req.params.id);
+            if (transaksiDetail) {
+                yield transaksiDetail.destroy();
+                res.status(200).json({ message: 'Transaction detail deleted successfully' });
+            }
+            else {
+                res.status(404).json({ error: 'Transaction detail not found' });
+            }
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
+exports.default = {
+    createTransaksiDetail,
+    getTransaksiDetailList,
+    getTransaksiDetailById,
+    updateTransaksiDetail,
+    deleteTransaksiDetail,
+};
