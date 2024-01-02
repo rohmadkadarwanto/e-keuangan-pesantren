@@ -1,0 +1,97 @@
+
+<div class="content-wrapper" id="entitasEditForm" style="display: none;">
+  <div class="content-header">
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Edit Nasabah</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+
+    <div class="container">
+
+        <div class="row">
+          <div class="col-12 col-sm-6 col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h2>Data Nasabah</h2>
+              </div>
+              <div class="card-body">
+                <form data-toggle="validator">
+
+                  <div class="form-group">
+                    <label for="tipe_entitas">Tipe Nasabah:</label>
+                    <!--input type="text" class="form-control" id="tipe_entitas" name="tipe_entitas" required-->
+                    <select class="form-control" id="tipe_entitas" name="tipe_entitas" required data-error="Pilih tipe nasabah">
+
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="nama_entitas">Nama Nasabah:</label>
+                    <input type="text" class="form-control" id="nama_entitas" name="nama_entitas" required data-error="Nama Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="telp_entitas">Telepon Nasabah:</label>
+                    <input type="number" class="form-control" id="telp_entitas" name="telp_entitas" required data-error="Telepon Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="alamat_entitas">Alamat Nasabah:</label>
+                    <input type="text" class="form-control" id="alamat_entitas" name="alamat_entitas" required data-error="Alamat Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="email_entitas">Email Nasabah:</label>
+                    <input type="email" class="form-control" id="email_entitas" name="email_entitas" required data-error="Email Nasabah harus diisi" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan email yang valid">
+                  </div>
+                  <div class="form-group">
+                    <label for="informasi_tambahan_entitas">Informasi Tambahan Nasabah:</label>
+                    <textarea class="form-control" id="informasi_tambahan_entitas" name="informasi_tambahan_entitas" required data-error="Informasi Tambahan Nasabah harus diisi"></textarea>
+                  </div>
+
+                  <input type="hidden" id="kode_entitas" name="kode_entitas">
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h2>Data Akun/rekening</h2>
+              </div>
+              <div class="card-body">
+                <form>
+                  <div class="form-group">
+                    <label for="nama_akun">Nama Akun:</label>
+                    <input type="text" class="form-control" id="nama_akun" name="nama_akun" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="saldo_awal">Saldo Awal:</label>
+                    <input type="text" class="form-control" id="saldo_awal" name="saldo_awal" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="tipe_transaksi">Tipe Transaksi:</label>
+                    <select class="form-control" id="tipe_transaksi" name="tipe_transaksi" required data-error="Pilih tipe transaksi">
+                    </select>
+                  </div>
+
+
+                  <input type="hidden" id="keykode_akun" name="keykode_akun">
+
+                  <!-- Form fields will be added dynamically here -->
+                  <button type="button" class="btn btn-primary" onclick="saveEntitas()">Save</button>
+                  <button type="button" class="btn btn-danger" onclick="cancelEntitasEditForm()">Cancel</button>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+    </div>
+
+  </section>
+</div>

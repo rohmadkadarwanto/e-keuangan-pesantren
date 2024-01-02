@@ -37,6 +37,7 @@ TransaksiDetail.init({
         type: sequelize_1.DataTypes.DATE,
     },
 }, {
+    modelName: 'TransaksiDetails',
     tableName: 'transaksi_detail',
     freezeTableName: true,
     sequelize: database_1.default,

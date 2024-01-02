@@ -1,10 +1,10 @@
 {
   "name": "Pesntren Keuangan",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "description": "Keuangan",
-  "main": "serverTransaksi.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node serverTransaksi.js"
+    "start": "node app.js"
   },
   "keywords": [
     "express",
@@ -19,7 +19,7 @@
     "ejs": "^3.1.9",
     "express": "^4.17.1",
     "mysql2": "^2.3.0",
-    "sequelize": "^6.9.0",
+    "sequelize": "^6.35.2",
     "simple-update-notifier": "^2.0.0"
   }
 }

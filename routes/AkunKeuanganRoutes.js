@@ -15,4 +15,5 @@ router.get('/:kodeAkun', AkunKeuanganController_1.default.getAkunKeuanganByAkun)
 router.get('/entitas/:kodeEntitas', AkunKeuanganController_1.default.getAkunKeuanganByEntitas);
 //router.get('/saldo', AkunKeuanganController.getDetailSaldoAkun);
 router.get('/saldo/:kodeAkun', AkunKeuanganController_1.default.getDetailSaldoAkun);
+router.get('/saldo/entitas/:kodeEntitas', AkunKeuanganController_1.default.getDetailSaldoByEntitas);
 exports.default = router;

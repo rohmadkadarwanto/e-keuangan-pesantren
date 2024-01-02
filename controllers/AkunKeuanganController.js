@@ -15,6 +15,60 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../config/database"));
 const AkunKeuangan_1 = __importDefault(require("../models/AkunKeuangan"));
 const TransaksiDetail_1 = __importDefault(require("../models/TransaksiDetail"));
+function getDetailSaldoByEntitas(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const kode_entitas = req.params.kodeEntitas;
+        const tipe_akun = req.params.tipeAkun || 'debit';
+        try {
+            const DetailSaldoAkun = yield AkunKeuangan_1.default.findAll({
+                attributes: [
+                    'tipe_transaksi',
+                    'saldo_awal',
+                    [
+                        database_1.default.literal('COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'kredit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'kredit',
+                    ],
+                    [
+                        database_1.default.literal('COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'debit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'debit',
+                    ],
+                    [
+                        database_1.default.literal('AkunKeuangan.saldo_awal + COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'kredit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN TransaksiDetails.tipe_transaksi = \'debit\' THEN TransaksiDetails.jumlah ELSE 0 END), 0)'),
+                        'saldo',
+                    ],
+                ],
+                include: [
+                    {
+                        model: TransaksiDetail_1.default,
+                        attributes: [],
+                        required: false,
+                    },
+                ],
+                where: {
+                    kode_entitas: kode_entitas
+                },
+                group: ['AkunKeuangan.kode_entitas', 'AkunKeuangan.tipe_transaksi'],
+            });
+            // Calculate total kredit and debit
+            const totalKredit = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('kredit') || 0), 0);
+            const totalDebit = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('debit') || 0), 0);
+            const saldoAwal = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('saldo_awal') || 0), 0);
+            const totalSaldo = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('saldo') || 0), 0);
+            // Mapping results to format the response
+            const SaldoAkun = DetailSaldoAkun.map(result => ({
+                tipe_transaksi: result.tipe_transaksi,
+                saldo_awal: result.get('saldo_awal'),
+                kredit: result.get('kredit'),
+                debit: result.get('debit'),
+                saldo: result.get('saldo'),
+            }));
+            res.status(200).json({ saldoAwal, totalSaldo, totalKredit, totalDebit });
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
+}
 function getDetailSaldoAkun(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -206,6 +260,7 @@ exports.default = {
     getAkunKeuanganById,
     getAkunKeuanganByAkun,
     getAkunKeuanganByEntitas,
+    getDetailSaldoByEntitas,
     updateAkunKeuangan,
     deleteAkunKeuangan,
 };

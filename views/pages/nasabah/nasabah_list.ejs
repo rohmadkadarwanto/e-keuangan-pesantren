@@ -1,0 +1,165 @@
+<div class="content-wrapper" id="entitasList">
+  <div class="content-header">
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Nasabah</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-sm-right">
+            <button class="btn btn-dark" onclick="showNewEntitasForm()">Nasabah Baru</button>
+            <button class="btn btn-info" onclick="showNewEntitasForm()">Tambah Akun/Rekening</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+
+    <div class="container">
+      <!-- List Entitas -->
+      <div  class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-users mr-1"></i>
+            Dafatar Nasabah
+          </h3>
+        </div>
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama</th>
+                <th>Telp</th>
+                <th>Tanggal Masuk</th>
+                <th>Tipe Nasabah</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Data will be loaded dynamically here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Create/Edit Form -->
+      <div id="entitasForm" style="display: none;">
+        <div class="row">
+          <div class="col-12 col-sm-6 col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h2>Data Nasabah</h2>
+              </div>
+              <div class="card-body">
+                <form data-toggle="validator">
+
+                  <div class="form-group">
+                    <label for="tipe_entitas">Tipe Nasabah:</label>
+                    <!--input type="text" class="form-control" id="tipe_entitas" name="tipe_entitas" required-->
+                    <select class="form-control" id="tipe_entitas" name="tipe_entitas" required data-error="Pilih tipe nasabah">
+
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="nama_entitas">Nama Nasabah:</label>
+                    <input type="text" class="form-control" id="nama_entitas" name="nama_entitas" required data-error="Nama Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="telp_entitas">Telepon Nasabah:</label>
+                    <input type="number" class="form-control" id="telp_entitas" name="telp_entitas" required data-error="Telepon Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="alamat_entitas">Alamat Nasabah:</label>
+                    <input type="text" class="form-control" id="alamat_entitas" name="alamat_entitas" required data-error="Alamat Nasabah harus diisi">
+                  </div>
+                  <div class="form-group">
+                    <label for="email_entitas">Email Nasabah:</label>
+                    <input type="email" class="form-control" id="email_entitas" name="email_entitas" required data-error="Email Nasabah harus diisi" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Masukkan email yang valid">
+                  </div>
+                  <div class="form-group">
+                    <label for="informasi_tambahan_entitas">Informasi Tambahan Nasabah:</label>
+                    <textarea class="form-control" id="informasi_tambahan_entitas" name="informasi_tambahan_entitas" required data-error="Informasi Tambahan Nasabah harus diisi"></textarea>
+                  </div>
+
+                  <input type="hidden" id="kode_entitas" name="kode_entitas">
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h2>Data Akun/rekening</h2>
+              </div>
+              <div class="card-body">
+                <form>
+                  <div class="form-group">
+                    <label for="nama_akun">Nama Akun:</label>
+                    <input type="text" class="form-control" id="nama_akun" name="nama_akun" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="saldo_awal">Saldo Awal:</label>
+                    <input type="text" class="form-control" id="saldo_awal" name="saldo_awal" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="tipe_transaksi">Tipe Transaksi:</label>
+                    <select class="form-control" id="tipe_transaksi" name="tipe_transaksi" required data-error="Pilih tipe transaksi">
+                    </select>
+                  </div>
+
+
+                  <input type="hidden" id="keykode_akun" name="keykode_akun">
+
+                  <!-- Form fields will be added dynamically here -->
+                  <button type="button" class="btn btn-primary" onclick="saveEntitas()">Save</button>
+                  <button type="button" class="btn btn-danger" onclick="cancelEntitasForm()">Cancel</button>
+
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="entitasDetail" style="display: none;" class="card">
+        <div class="card-header">
+          <button class="btn btn-danger" onclick="cancelEntitasDetail()">Kembali</button>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>Kode Entitas:</strong> <span id="detail_kode_entitas">Loading</span>
+            </li>
+            <li class="list-group-item">
+              <strong>Nama Nasabah:</strong> <span id="detail_nama_entitas">Loading</span>
+            </li>
+            <li class="list-group-item">
+              <strong>Telepon Nasabah:</strong> <span id="detail_telp_entitas">Loading</span>
+            </li>
+            <li class="list-group-item">
+              <strong>Alamat Nasabah:</strong> <span id="detail_alamat_entitas">Loading</span>
+            </li>
+            <li class="list-group-item">
+              <strong>Email Nasabah:</strong> <span id="detail_email_entitas">Loading</span>
+            </li>
+            <li class="list-group-item">
+              <strong>Informasi Tambahan Nasabah:</strong>
+              <p id="detail_informasi_tambahan_entitas">Loading</p>
+            </li>
+            <li class="list-group-item">
+              <strong>Tipe Nasabah:</strong> <span id="detail_tipe_entitas">Your Tipe Nasabah</span>
+            </li>
+          </ul>
+
+        </div>
+      </div>
+
+    </div>
+
+
+
+  </section>
+</div>

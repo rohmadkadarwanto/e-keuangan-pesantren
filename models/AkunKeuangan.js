@@ -7,17 +7,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const database_1 = __importDefault(require("../config/database"));
 const TransaksiDetail_1 = __importDefault(require("./TransaksiDetail"));
+const Entitas_1 = __importDefault(require("./Entitas"));
 class AkunKeuangan extends sequelize_1.Model {
 }
 AkunKeuangan.init({
-    id_akun: {
-        type: sequelize_1.DataTypes.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-    },
     kode_akun: {
         type: sequelize_1.DataTypes.STRING(255),
         unique: true,
+        primaryKey: true,
     },
     kode_entitas: {
         type: sequelize_1.DataTypes.STRING(255),
@@ -41,5 +38,12 @@ AkunKeuangan.init({
 AkunKeuangan.hasMany(TransaksiDetail_1.default, {
     foreignKey: 'kode_akun',
     sourceKey: 'kode_akun',
+});
+// Hubungan antara Entitas dan AkunKeuangan
+Entitas_1.default.hasMany(AkunKeuangan, {
+    foreignKey: 'kode_entitas',
+});
+AkunKeuangan.belongsTo(Entitas_1.default, {
+    foreignKey: 'kode_entitas',
 });
 exports.default = AkunKeuangan;

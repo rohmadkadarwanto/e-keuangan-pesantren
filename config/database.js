@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sequelize = void 0;
+// src/config/database.ts
 const sequelize_1 = require("sequelize");
 const sequelize = new sequelize_1.Sequelize({
     dialect: 'mysql',
-    host: '0.0.0.0',
+    host: '103.210.69.93',
     port: 3306,
     username: 'root',
     password: 'Delta@1988dsn',
     database: 'e_pesantren_transaksi',
+    logging: false, // Enable logging
 });
-exports.sequelize = sequelize;
 // Test the database connection
 sequelize
     .authenticate()
@@ -20,3 +20,4 @@ sequelize
     .catch((error) => {
     console.error('Unable to connect to the database:', error);
 });
+exports.default = sequelize;
