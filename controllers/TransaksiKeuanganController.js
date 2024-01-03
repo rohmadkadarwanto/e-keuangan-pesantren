@@ -37,17 +37,19 @@ function createTransaksiKeuangan(req, res) {
                 tanggal_transaksi,
                 keterangan,
             });
+            const tipeTransaksi = yield AkunKeuangan_1.default.findAll({ where: { kode_akun } });
             // Simpan data transaksi detail ke dalam array untuk proses batch
             const akunKeuangan = yield AkunKeuangan_1.default.findAll({ where: { kode_entitas } });
             for (const data of akunKeuangan) {
                 const tipe = data.tipe_transaksi;
-                const kredit = tipe === 'kredit' ? 'debit' : 'kredit';
+                const kredit = tipeTransaksi[0].tipe_transaksi === 'kredit' ? 'debit' : 'kredit';
+                //tipeTransaksi[0].tipe_transaksi
                 const detailData = {
                     kode_transaksi,
                     kode_transaksi_detail: `TD${new Date().toISOString().replace(/[^0-9]/g, '')}`,
                     kode_akun: data.kode_akun,
                     kode_jenis_transaksi,
-                    tipe_transaksi: kredit,
+                    tipe_transaksi: tipe === 'debit' ? (kredit === 'debit' ? 'kredit' : 'debit') : (kredit === 'debit' ? 'debit' : 'kredit'),
                     jumlah,
                     tanggal_transaksi,
                 };
