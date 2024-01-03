@@ -17,7 +17,7 @@ const WaliSantriRoutes_1 = __importDefault(require("./routes/WaliSantriRoutes"))
 const NeracaRoutes_1 = __importDefault(require("./routes/NeracaRoutes"));
 const TransaksiEjsRoutes_1 = __importDefault(require("./routes/TransaksiEjsRoutes"));
 const app = (0, express_1.default)();
-const port = 3000;
+const port = 3006;
 // Middleware and other configurations
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
