@@ -205,9 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const newOption = document.createElement("option");
       newOption.value = option.kode_akun;
       newOption.text = option.nama_akun + ' ('+getTipeTransaksiText(option.tipe_transaksi)+')';
-      if(option.tipe_transaksi == 'debit') {
+      //if(option.tipe_transaksi == 'debit') {
         dropdown.appendChild(newOption);
-      }
+      //}
     });
   }
 

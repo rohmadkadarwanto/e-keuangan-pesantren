@@ -41,7 +41,7 @@ function createTransaksiKeuangan(req, res) {
             const akunKeuangan = yield AkunKeuangan_1.default.findAll({ where: { kode_entitas } });
             for (const data of akunKeuangan) {
                 const tipe = data.tipe_transaksi;
-                const kredit = kode_jenis_transaksi === 'kredit' ? 'debit' : 'kredit';
+                const kredit = tipe === 'kredit' ? 'debit' : 'kredit';
                 const detailData = {
                     kode_transaksi,
                     kode_transaksi_detail: `TD${new Date().toISOString().replace(/[^0-9]/g, '')}`,
