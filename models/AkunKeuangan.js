@@ -18,15 +18,33 @@ AkunKeuangan.init({
     },
     kode_entitas: {
         type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     nama_akun: {
         type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        unique: true,
+        validate: {
+            notEmpty: true,
+        },
     },
     saldo_awal: {
         type: sequelize_1.DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        validate: {
+            isDecimal: true,
+            min: 0,
+        },
     },
     tipe_transaksi: {
         type: sequelize_1.DataTypes.STRING(10),
+        allowNull: false,
+        validate: {
+            isIn: [['debit', 'kredit']],
+        },
     },
 }, {
     sequelize: database_1.default,

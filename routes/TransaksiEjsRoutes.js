@@ -8,6 +8,9 @@ const router = express_1.default.Router();
 router.get('/dashboard', (req, res) => {
     res.render('pages/transaksi/dashboard');
 });
+router.get('/nasabah', (req, res) => {
+    res.render('pages/nasabah/nasabah');
+});
 router.get('/', (req, res) => {
     res.render('pages/nasabah/nasabah');
 });

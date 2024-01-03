@@ -16,96 +16,20 @@ const database_1 = __importDefault(require("../config/database"));
 const TransaksiDetail_1 = __importDefault(require("../models/TransaksiDetail"));
 const TransaksiKeuangan_1 = __importDefault(require("../models/TransaksiKeuangan"));
 const AkunKeuangan_1 = __importDefault(require("../models/AkunKeuangan"));
-function createTransaksiKeuanganSinggle(req, res) {
+function createTransaksiDetail(detailData) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { kode_akun, jumlah, kode_transaksi, kode_entitas, kode_jenis_transaksi, tanggal_transaksi, keterangan, tipe_transaksi } = req.body;
-            const transaksiKeuangan = yield TransaksiKeuangan_1.default.create({
-                kode_transaksi,
-                kode_entitas,
-                kode_jenis_transaksi,
-                tanggal_transaksi,
-                keterangan,
-            });
-            try {
-                // Simpan data transaksi detail ke dalam array untuk proses batch
-                const transaksiDetailData = [];
-                // Iterasi akun untuk membuat transaksi detail
-                const akunKeuangan = yield AkunKeuangan_1.default.findAll({
-                    where: {
-                        kode_entitas: kode_entitas,
-                    },
-                });
-                const detailDebit = {
-                    kode_transaksi,
-                    kode_akun: kode_akun,
-                    kode_jenis_transaksi,
-                    tipe_transaksi: tipe_transaksi,
-                    jumlah,
-                    tanggal_transaksi,
-                };
-                // Batch insert transaksi detail
-                yield TransaksiDetail_1.default.create(detailDebit);
-                for (const data of akunKeuangan) {
-                    /*let tipe = tipe_transaksi || data.tipe_transaksi;
-                    let kredit = 'kredit';
-                    let debit = 'debit';
-            
-                    // Jika tipe transaksi adalah 'kredit' dan tipe_transaksi juga 'kredit'
-                    if (data.tipe_transaksi === 'kredit' && tipe_transaksi === 'kredit') {
-                      // Ubah tipe menjadi 'debit'
-                      tipe = 'debit';
-                    }
-            
-            
-                    if (tipe_transaksi === 'kredit') {
-                      kredit = 'debit';
-                      debit = 'kredit';
-                    }
-            
-            
-                    if (data.tipe_transaksi === 'kredit') {
-            
-                    const detailKredit = {
-                      kode_transaksi,
-                      kode_akun: data.kode_akun,
-                      kode_jenis_transaksi,
-                      tipe_transaksi: kredit,
-                      jumlah,
-                      tanggal_transaksi,
-                    };
-            
-                    await TransaksiDetail.create(detailKredit);
-            
-                    } else {
-                    const detailDebit = {
-                      kode_transaksi,
-                      kode_akun: data.kode_akun,
-                      kode_jenis_transaksi,
-                      tipe_transaksi: debit,
-                      jumlah,
-                      tanggal_transaksi,
-                    };
-                    // Batch insert transaksi detail
-                    await TransaksiDetail.create(detailDebit);
-            
-                    }*/
-                }
-                res.status(201).json(transaksiKeuangan);
-            }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+            yield TransaksiDetail_1.default.create(detailData);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            throw new Error(`Error creating transaction detail: ${error.message}`);
         }
     });
 }
 function createTransaksiKeuangan(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { kode_akun, jumlah, kode_transaksi, kode_entitas, kode_jenis_transaksi, tanggal_transaksi, keterangan, tipe_transaksi } = req.body;
+            const { kode_akun, jumlah, kode_transaksi, kode_entitas, kode_jenis_transaksi, tanggal_transaksi, keterangan } = req.body;
             const transaksiKeuangan = yield TransaksiKeuangan_1.default.create({
                 kode_transaksi,
                 kode_entitas,
@@ -113,119 +37,26 @@ function createTransaksiKeuangan(req, res) {
                 tanggal_transaksi,
                 keterangan,
             });
-            try {
-                // Simpan data transaksi detail ke dalam array untuk proses batch
-                const transaksiDetailData = [];
-                // Iterasi akun untuk membuat transaksi detail
-                const akunKeuangan = yield AkunKeuangan_1.default.findAll({
-                    where: {
-                        kode_entitas: kode_entitas,
-                    },
-                });
-                for (const data of akunKeuangan) {
-                    let tipe = tipe_transaksi || data.tipe_transaksi;
-                    let kredit = 'kredit';
-                    let debit = 'debit';
-                    // Jika tipe transaksi adalah 'kredit' dan tipe_transaksi juga 'kredit'
-                    if (data.tipe_transaksi === 'kredit' && tipe_transaksi === 'kredit') {
-                        // Ubah tipe menjadi 'debit'
-                        tipe = 'debit';
-                    }
-                    if (tipe_transaksi === 'kredit') {
-                        kredit = 'debit';
-                        debit = 'kredit';
-                    }
-                    if (data.tipe_transaksi === 'kredit') {
-                        const detailKredit = {
-                            kode_transaksi,
-                            kode_akun: data.kode_akun,
-                            kode_jenis_transaksi,
-                            tipe_transaksi: kredit,
-                            jumlah,
-                            tanggal_transaksi,
-                        };
-                        yield TransaksiDetail_1.default.create(detailKredit);
-                    }
-                    else {
-                        const detailDebit = {
-                            kode_transaksi,
-                            kode_akun: data.kode_akun,
-                            kode_jenis_transaksi,
-                            tipe_transaksi: debit,
-                            jumlah,
-                            tanggal_transaksi,
-                        };
-                        // Batch insert transaksi detail
-                        yield TransaksiDetail_1.default.create(detailDebit);
-                    }
-                }
-                res.status(201).json(transaksiKeuangan);
-            }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        }
-        catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    });
-}
-function createTransaksiKeuanganOld(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const { kode_akun, jumlah, kode_transaksi, kode_entitas, kode_jenis_transaksi, tanggal_transaksi, keterangan, tipe_transaksi } = req.body;
-            const transaksiKeuangan = yield TransaksiKeuangan_1.default.create({
-                kode_transaksi,
-                kode_entitas,
-                kode_jenis_transaksi,
-                tanggal_transaksi,
-                keterangan,
-            });
-            try {
-                // Simpan data transaksi detail ke dalam array untuk proses batch
-                const transaksiDetailData = [];
-                // Iterasi akun untuk membuat transaksi detail
-                const akunKeuangan = yield AkunKeuangan_1.default.findAll({
-                    where: {
-                        kode_akun: kode_akun,
-                    },
-                });
-                for (const data of akunKeuangan) {
-                    let tipe = tipe_transaksi || data.tipe_transaksi;
-                    let kredit = 'kredit';
-                    let debit = 'debit';
-                    /*if (tipe_transaksi === 'kredit' && data.tipe_transaksi === 'kredit') {
-                      kredit = 'debit';
-                      debit = 'kredit';
-                    }*/
-                }
-                const detailKredit = {
+            // Simpan data transaksi detail ke dalam array untuk proses batch
+            const akunKeuangan = yield AkunKeuangan_1.default.findAll({ where: { kode_entitas } });
+            for (const data of akunKeuangan) {
+                const tipe = data.tipe_transaksi;
+                const kredit = tipe === 'kredit' ? 'debit' : 'kredit';
+                const detailData = {
                     kode_transaksi,
-                    kode_akun: kode_akun,
+                    kode_transaksi_detail: `TD${new Date().toISOString().replace(/[^0-9]/g, '')}`,
+                    kode_akun: data.kode_akun,
                     kode_jenis_transaksi,
-                    tipe_transaksi: 'kredit',
+                    tipe_transaksi: kredit,
                     jumlah,
                     tanggal_transaksi,
                 };
-                yield TransaksiDetail_1.default.create(detailKredit);
-                const detailDebit = {
-                    kode_transaksi,
-                    kode_akun: kode_akun,
-                    kode_jenis_transaksi,
-                    tipe_transaksi: 'debit',
-                    jumlah,
-                    tanggal_transaksi,
-                };
-                // Batch insert transaksi detail
-                yield TransaksiDetail_1.default.create(detailDebit);
-                res.status(201).json(transaksiKeuangan);
+                yield createTransaksiDetail(detailData);
             }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+            return res.status(201).json(transaksiKeuangan);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -233,10 +64,10 @@ function getTransaksiKeuanganList(_req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const transaksiKeuanganList = yield TransaksiKeuangan_1.default.findAll();
-            res.status(200).json(transaksiKeuanganList);
+            return res.status(200).json(transaksiKeuanganList);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -286,10 +117,10 @@ function getTransaksiKeuanganById(req, res) {
                 debit: result.get('debit'),
                 saldo: result.get('saldo'),
             }));
-            res.status(200).json(transaksiKeuangan);
+            return res.status(200).json(transaksiKeuangan);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -307,10 +138,10 @@ function getTransaksiKeuanganByAkun(req, res) {
                     },
                 ],
             });
-            res.status(200).json(transaksiKeuangan);
+            return res.status(200).json(transaksiKeuangan);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -326,14 +157,14 @@ function updateTransaksiKeuangan(req, res) {
                     tanggal_transaksi,
                     keterangan,
                 });
-                res.status(200).json(transaksiKeuangan);
+                return res.status(200).json(transaksiKeuangan);
             }
             else {
-                res.status(404).json({ error: 'Financial transaction not found' });
+                return res.status(404).json({ error: 'Financial transaction not found' });
             }
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -343,16 +174,21 @@ function deleteTransaksiKeuangan(req, res) {
             const transaksiKeuangan = yield TransaksiKeuangan_1.default.findByPk(req.params.id);
             if (transaksiKeuangan) {
                 yield transaksiKeuangan.destroy();
-                res.status(200).json({ message: 'Financial transaction deleted successfully' });
+                return res.status(200).json({ message: 'Financial transaction deleted successfully' });
             }
             else {
-                res.status(404).json({ error: 'Financial transaction not found' });
+                return res.status(404).json({ error: 'Financial transaction not found' });
             }
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
+}
+function generateTransactionCode() {
+    const timestamp = new Date().toISOString().replace(/[^0-9]/g, '');
+    const randomNumber = Math.floor(Math.random() * 100000000);
+    return `TR${timestamp}${randomNumber}`;
 }
 exports.default = {
     createTransaksiKeuangan,

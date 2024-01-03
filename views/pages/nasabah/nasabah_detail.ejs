@@ -75,17 +75,17 @@
         <div class="card-header p-2">
           <ul class="nav nav-pills">
             <li class="nav-item"><a class="nav-link active" href="#tprofil" data-toggle="tab">Data Nasabah</a></li>
-            <li class="nav-item"><a class="nav-link" href="#neraca" data-toggle="tab">Neraca</a></li>
-            <li class="nav-item"><a class="nav-link" href="#arus-kas" data-toggle="tab">Arus Kas</a></li>
+            <!--li class="nav-item"><a class="nav-link" href="#neraca" data-toggle="tab">Neraca</a></li>
+            <li class="nav-item"><a class="nav-link" href="#arus-kas" data-toggle="tab">Arus Kas</a></li-->
             <li class="nav-item"><a class="nav-link" href="#buku-besar" data-toggle="tab">Buku Besar</a></li>
           </ul>
         </div><!-- /.card-header -->
         <div class="card-body">
           <div class="tab-content">
             <div class="active tab-pane" id="tprofil">
-              <ul class="list-group">
+              <ul class="list-group" id="list-detail-profile">
                 <li class="list-group-item">
-                  <strong>Kode Entitas:</strong> <span id="detail_kode_entitas">Loading</span>
+                  <strong>Kode Nasabah:</strong> <span id="detail_kode_entitas">Loading</span>
                 </li>
                 <li class="list-group-item">
                   <strong>Nama Nasabah:</strong> <span id="detail_nama_entitas">Loading</span>
@@ -106,6 +106,7 @@
                 <li class="list-group-item">
                   <strong>Tipe Nasabah:</strong> <span id="detail_tipe_entitas">Your Tipe Nasabah</span>
                 </li>
+
               </ul>
             </div>
             <div class="tab-pane" id="neraca">

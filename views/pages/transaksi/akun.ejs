@@ -1,13 +1,33 @@
 <%- include('../../partials/header') %>
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Data Akun Keuangan</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-sm-right">
+            <button class="btn btn-success" onclick="showNewAkunForm()">Tambah Akun</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div class="container mt-5">
-      <h2 class="mb-4">Data Akun Keuangan</h2>
+  <section class="content">
+    <div class="container">
 
       <!-- List Akun Keuangan -->
       <div id="akunList" class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-users mr-1"></i>
+            Daftar Akun
+          </h3>
+        </div>
         <div class="card-body">
-          <button class="btn btn-success mb-3" onclick="showNewAkunForm()">Tambah Akun</button>
-          <table class="table">
+          <table class="table table-responsive">
             <thead>
               <tr>
                 <th>Kode Akun</th>
@@ -91,7 +111,8 @@
       </div>
 
     </div>
-
+  </section>
+</div>
   <script>
     const endpoint = "/api/akun-keuangan";
 

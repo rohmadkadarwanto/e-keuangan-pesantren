@@ -17,24 +17,53 @@ TransaksiDetail.init({
     kode_transaksi_detail: {
         type: sequelize_1.DataTypes.STRING(255),
         unique: true,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     kode_transaksi: {
         type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     kode_akun: {
         type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     kode_jenis_transaksi: {
         type: sequelize_1.DataTypes.STRING(255),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     tipe_transaksi: {
         type: sequelize_1.DataTypes.STRING(10),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     jumlah: {
         type: sequelize_1.DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+        validate: {
+            isDecimal: true,
+            min: 0,
+        },
     },
     tanggal_transaksi: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
 }, {
     modelName: 'TransaksiDetails',

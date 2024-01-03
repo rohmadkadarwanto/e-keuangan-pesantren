@@ -21,6 +21,9 @@ JenisTransaksi.init({
     },
     nama_jenis_transaksi: {
         type: sequelize_1.DataTypes.STRING,
+    },
+    tipe_transaksi: {
+        type: sequelize_1.DataTypes.STRING,
     }
 }, {
     sequelize: database_1.default,

@@ -30,7 +30,16 @@ function getSelectedText(elementId) {
   }
 
   function resetEntitasForm() {
-    const formElements = ['kode_entitas', 'nama_entitas', 'telp_entitas', 'alamat_entitas', 'email_entitas', 'informasi_tambahan_entitas', 'tipe_entitas'];
+    const formElements = [
+      'kode_entitas',
+      'nama_entitas',
+      'telp_entitas',
+      'alamat_entitas',
+      'email_entitas',
+      'informasi_tambahan_entitas',
+      'nama_akun',
+      'saldo_awal',
+    ];
     formElements.forEach(element => {
       document.getElementById(element).value = '';
     });
@@ -122,15 +131,7 @@ function getSelectedText(elementId) {
         showEntitasDetail();
         populateEntitasDetail(data.entitas);
         populateAkunBox(data.saldoSetelahPenyesuaian);
-        let saldo = 0;
-        data.saldoSetelahPenyesuaian.forEach(row => {
-            if(row.tipe_transaksi == 'debit') {
-              saldo += row.kredit;
-            }
-        });
 
-        //document.getElementById('info-box-saldo-awal').innerText = formatRupiah(data.saldoAwal);
-        //document.getElementById('info-box-saldo').innerText = formatRupiah(saldo);
         document.getElementById('info-box-kredit').innerText = formatRupiah(data.totalKredit);
         document.getElementById('info-box-debit').innerText = formatRupiah(data.totalDebit);
       })
@@ -142,14 +143,33 @@ function getSelectedText(elementId) {
 
   function populateAkunBox(data) {
     const box = document.getElementById("akun-box");
-    const boxSaldoAwal = document.getElementById("col-saldo-awal");
+    const listDetailProfile = document.getElementById("list-detail-profile");
+
 
     const elementsToRemove = document.querySelectorAll('.box-akun');
     elementsToRemove.forEach(element => element.remove());
 
+    const elementsToRemoveRekening = document.querySelectorAll('.rekening');
+    elementsToRemoveRekening.forEach(element => element.remove());
+
       // Tambahkan opsi baru dari array
       data.forEach(option => {
         const existingElement = document.getElementById(`info-box-${option.kode_akun}`);
+        const existingElementRekening = document.getElementById(`no-rekening-${option.kode_akun}`);
+
+        if(!existingElementRekening) {
+          const newList = document.createElement("li");
+          newList.setAttribute("class", "list-group-item rekening");
+
+          newList.innerHTML = `<strong>Rekening ${getTipeTransaksiText(option.tipe_transaksi)}:</strong> <span id="no-rekening-${option.kode_akun}">${option.kode_akun}</span>`;
+          listDetailProfile.appendChild(newList);
+        } else {
+          existingElementRekening.innerText = option.kode_akun;
+        }
+
+
+
+
         //if(option.tipe_transaksi == 'debit') {
           if(!existingElement) {
             const newBox = document.createElement("div");
@@ -196,6 +216,9 @@ function getSelectedText(elementId) {
         email_entitas: document.getElementById('email_entitas').value,
         informasi_tambahan_entitas: document.getElementById('informasi_tambahan_entitas').value,
         tipe_entitas: document.getElementById('tipe_entitas').value,
+        informasi_tambahan_entitas: document.getElementById('informasi_tambahan_entitas').value,
+        nama_akun: document.getElementById('nama_akun').value,
+        saldo_awal: document.getElementById('saldo_awal').value,
       };
 
       const entitasId = document.getElementById('kode_entitas').value;
@@ -209,8 +232,15 @@ function getSelectedText(elementId) {
           body: JSON.stringify(formData),
         });
         const data = await response.json();
-        console.log('Entitas updated successfully:', data);
-        showAlert('success', 'Entitas updated successfully');
+        if(data.success) {
+          //console.log('Entitas updated successfully:', data);
+          fetchEntitasList();
+          cancelEntitasForm();
+          showAlert('success', data.message);
+        } else {
+          //console.log('Entitas updated successfully:', data);
+          showAlert('error', data.message);
+        }
       } else {
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -220,12 +250,20 @@ function getSelectedText(elementId) {
           body: JSON.stringify(formData),
         });
         const data = await response.json();
-        console.log('Entitas created successfully:', data);
-        showAlert('success', 'Entitas created successfully');
+        if(data.success) {
+          //console.log('Entitas updated successfully:', data);
+          fetchEntitasList();
+          cancelEntitasForm();
+          showAlert('success', data.message);
+        } else {
+          //console.log('Entitas updated successfully:', data);
+          showAlert('error', data.message);
+        }
+
       }
 
-      fetchEntitasList();
-      cancelEntitasForm();
+
+
     } catch (error) {
       console.error('Error saving entitas:', error);
       showAlert('error', 'Error saving entitas');
@@ -279,19 +317,24 @@ function getSelectedText(elementId) {
   }
 
   function populateEntitasForm(data) {
-    document.getElementById('kode_entitas').value = data.kode_entitas;
-    document.getElementById('nama_entitas').value = data.nama_entitas;
-    document.getElementById('telp_entitas').value = data.telp_entitas;
-    document.getElementById('alamat_entitas').value = data.alamat_entitas;
-    document.getElementById('email_entitas').value = data.email_entitas;
-    document.getElementById('informasi_tambahan_entitas').value = data.informasi_tambahan_entitas;
+    document.getElementById('kode_entitas').value = data.entitas.kode_entitas;
+    document.getElementById('nama_entitas').value = data.entitas.nama_entitas;
+    document.getElementById('telp_entitas').value = data.entitas.telp_entitas;
+    document.getElementById('alamat_entitas').value = data.entitas.alamat_entitas;
+    document.getElementById('email_entitas').value = data.entitas.email_entitas;
+    document.getElementById('informasi_tambahan_entitas').value = data.entitas.informasi_tambahan_entitas;
+
+    document.getElementById('nama_akun').value = data.saldoSetelahPenyesuaian[0].nama_akun;
+    document.getElementById('saldo_awal').value = data.saldoAwal
+
+
     populateTipeEntitasDropdown();
     // Mendapatkan elemen dropdown tipe_entitas
     const tipeEntitasDropdown = document.getElementById('tipe_entitas');
 
     // Mengatur opsi yang sesuai sebagai selected
     for (let i = 0; i < tipeEntitasDropdown.options.length; i++) {
-      if (tipeEntitasDropdown.options[i].value === data.tipe_entitas) {
+      if (tipeEntitasDropdown.options[i].value === data.entitas.tipe_entitas) {
         tipeEntitasDropdown.options[i].selected = true;
         break;
       }

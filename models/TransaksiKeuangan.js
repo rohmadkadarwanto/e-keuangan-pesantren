@@ -18,18 +18,38 @@ TransaksiKeuangan.init({
     kode_transaksi: {
         type: sequelize_1.DataTypes.STRING,
         unique: true,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     kode_entitas: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     kode_jenis_transaksi: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     tanggal_transaksi: {
         type: sequelize_1.DataTypes.DATE,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
     keterangan: {
         type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            notEmpty: true,
+        },
     },
 }, {
     sequelize: database_1.default,

@@ -17,41 +17,58 @@ const Entitas_1 = __importDefault(require("../models/Entitas"));
 const TransaksiDetail_1 = __importDefault(require("../models/TransaksiDetail"));
 const TransaksiKeuangan_1 = __importDefault(require("../models/TransaksiKeuangan"));
 const AkunKeuangan_1 = __importDefault(require("../models/AkunKeuangan"));
-const sequelize_1 = require("sequelize");
 function createEntitas(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { nama_entitas, tipe_entitas, nama_akun, saldo_awal, tipe_transaksi } = req.body;
+            const { nama_entitas, tipe_entitas, telp_entitas, alamat_entitas, email_entitas, informasi_tambahan_entitas, nama_akun, saldo_awal } = req.body;
+            // Mendapatkan timestamp dari saat ini (dalam bentuk string)
             const timestamp = new Date().toISOString().replace(/[^0-9]/g, '');
-            const kode_akun = `${timestamp}`;
-            const kode_entitas = `NSB${timestamp}`;
-            const entitas = yield Entitas_1.default.create({
-                kode_entitas,
-                nama_entitas,
-                tipe_entitas,
-            });
-            const akunKeuangan = yield AkunKeuangan_1.default.create({
-                kode_akun,
-                kode_entitas,
-                nama_akun,
-                saldo_awal,
-                tipe_transaksi,
-            });
-            res.status(201).json(entitas);
+            // Menggunakan timestamp untuk membuat angka acak
+            const randomNumber = Math.floor(Math.random() * 100000000); // Ubah sesuai kebutuhan
+            // Menggabungkan timestamp dan angka acak untuk membentuk nomor rekening
+            const accountNumber = timestamp + randomNumber;
+            // Mengacak angka dengan mengambil 12 digit pertama
+            const shuffledDigits = accountNumber.slice(0, 13).split('').sort(() => Math.random() - 0.5).join('');
+            // Menambahkan angka tertentu setelah pengacakan digit
+            const kodeAkunKredit = parseInt(shuffledDigits) + '381';
+            const kodeAkunDebit = parseInt(shuffledDigits) + '382';
+            const kode_entitas = timestamp;
+            // Check uniqueness before creating an entity
+            yield Entitas_1.default.validateUniqueness(telp_entitas, email_entitas);
+            try {
+                const entitas = yield Entitas_1.default.create({
+                    kode_entitas,
+                    nama_entitas,
+                    tipe_entitas,
+                    telp_entitas,
+                    alamat_entitas,
+                    email_entitas,
+                    informasi_tambahan_entitas,
+                    tanggal_masuk_entitas: new Date(),
+                });
+                const AkunKeuanganDebit = yield AkunKeuangan_1.default.create({
+                    kode_akun: kodeAkunDebit,
+                    kode_entitas,
+                    nama_akun,
+                    saldo_awal,
+                    tipe_transaksi: 'debit',
+                });
+                const AkunKeuanganKredit = yield AkunKeuangan_1.default.create({
+                    kode_akun: kodeAkunKredit,
+                    kode_entitas,
+                    nama_akun,
+                    saldo_awal: '0',
+                    tipe_transaksi: 'kredit',
+                });
+                return res.status(201).json({ success: true, message: 'Entitas dan Akun Keuangan berhasil dibuat.' });
+            }
+            catch (error) {
+                return res.status(500).json({ success: false, message: 'Terjadi kesalahan dalam proses pembuatan entitas dan akun keuangan.' });
+            }
+            //return res.status(201).json(entitas);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    });
-}
-function getEntitasList(_req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const entitasList = yield Entitas_1.default.findAll();
-            res.status(200).json(entitasList);
-        }
-        catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
@@ -135,34 +152,6 @@ function getEntitasById(req, res) {
                     'TransaksiDetails.kode_transaksi'
                 ],
             });
-            const transaksiPenyesuaian = yield database_1.default.query(`
-      SELECT
-        nama_akun,
-        CASE WHEN saldo >= 0 THEN saldo ELSE 0 END AS kredit,
-        CASE WHEN saldo < 0 THEN ABS(saldo) ELSE 0 END AS debit,
-        saldo
-      FROM (
-        SELECT
-          e.kode_entitas,
-          e.nama_entitas,
-          a.kode_akun,
-          a.nama_akun,
-          a.saldo_awal + COALESCE(SUM(CASE WHEN td.tipe_transaksi = 'kredit' THEN td.jumlah ELSE 0 END), 0) - COALESCE(SUM(CASE WHEN td.tipe_transaksi = 'debit' THEN td.jumlah ELSE 0 END), 0) AS saldo
-        FROM
-          entitas e
-        JOIN
-          akun_keuangan a ON e.kode_entitas = a.kode_entitas
-        LEFT JOIN
-          transaksi_detail td ON a.kode_akun = td.kode_akun
-        WHERE
-          e.kode_entitas = :id
-        GROUP BY
-          e.kode_entitas, a.kode_akun
-      ) AS saldo_setelah_penyesuaian
-    `, {
-                replacements: { id: req.params.id },
-                type: sequelize_1.QueryTypes.SELECT
-            });
             const saldoSetelahPenyesuaian = yield AkunKeuangan_1.default.findAll({
                 attributes: [
                     'kode_akun',
@@ -194,73 +183,110 @@ function getEntitasById(req, res) {
                     },
                 ],
                 group: ['AkunKeuangan.tipe_transaksi'],
-                //raw: true, // Mengembalikan hasil dalam bentuk plain object, bukan instance Sequelize
-                //nest: true, // Menetapkan hasil dalam bentuk yang lebih bersarang (objek dalam objek)
             });
             // Calculate total kredit and debit
             const totalKredit = saldoDebitKredit.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('kredit') || 0), 0);
             const totalDebit = saldoDebitKredit.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('debit') || 0), 0);
             const saldoAwal = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('saldo_awal') || 0), 0);
-            const totalSaldo = DetailSaldoAkun.reduce((sum, akun) => sum + parseFloat(akun.getDataValue('saldo') || 0), 0);
-            // Mapping results to format the response
-            /*const SaldoAkun = DetailSaldoAkun.map(result => ({
-              tipe_transaksi: result.tipe_transaksi,
-              saldo_awal: result.get('saldo_awal'),
-              kredit: result.get('kredit'),
-              debit: result.get('debit'),
-              saldo: result.get('saldo'),
-            }));*/
-            // Membuat map data
-            res.status(200).json({
+            return res.status(200).json({
                 saldoSetelahPenyesuaian,
                 entitas,
                 saldoAwal,
-                totalSaldo,
                 totalKredit,
                 totalDebit,
             });
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
 function updateEntitas(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { kode_entitas, nama_entitas, tipe_entitas } = req.body;
-            const entitas = yield Entitas_1.default.findByPk(req.params.id);
-            if (entitas) {
-                yield entitas.update({
-                    kode_entitas,
-                    nama_entitas,
-                    tipe_entitas,
+            const { nama_entitas, tipe_entitas, telp_entitas, alamat_entitas, email_entitas, informasi_tambahan_entitas, nama_akun, saldo_awal } = req.body;
+            // Check uniqueness before creating an entity
+            yield Entitas_1.default.validateUniqueness(telp_entitas, email_entitas);
+            try {
+                const entitas = yield Entitas_1.default.findByPk(req.params.id);
+                const akunKeuanganDebit = yield AkunKeuangan_1.default.findOne({
+                    where: {
+                        kode_entitas: req.params.id,
+                        tipe_transaksi: 'debit',
+                    },
                 });
-                res.status(200).json(entitas);
+                const akunKeuanganKredit = yield AkunKeuangan_1.default.findOne({
+                    where: {
+                        kode_entitas: req.params.id,
+                        tipe_transaksi: 'kredit',
+                    },
+                });
+                if (entitas) {
+                    yield entitas.update({
+                        nama_entitas,
+                        tipe_entitas,
+                        telp_entitas,
+                        alamat_entitas,
+                        email_entitas,
+                        informasi_tambahan_entitas
+                    });
+                    if (akunKeuanganDebit) {
+                        yield akunKeuanganDebit.update({
+                            nama_akun,
+                            saldo_awal
+                        });
+                    }
+                    if (akunKeuanganKredit) {
+                        yield akunKeuanganKredit.update({
+                            nama_akun,
+                            saldo_awal
+                        });
+                    }
+                }
+                return res.status(201).json({ success: true, message: 'Entitas dan Akun Keuangan berhasil diedit.' });
             }
-            else {
-                res.status(404).json({ error: 'Entity not found' });
+            catch (error) {
+                return res.status(500).json({ success: false, message: 'Terjadi kesalahan dalam proses perubahan entitas dan akun keuangan.' });
             }
+            //return res.status(201).json(entitas);
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     });
 }
 function deleteEntitas(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const entitas = yield Entitas_1.default.findByPk(req.params.id);
-            if (entitas) {
-                yield entitas.destroy();
-                res.status(200).json({ message: 'Entity deleted successfully' });
+            const entitasId = req.params.id;
+            const entitas = yield Entitas_1.default.findByPk(entitasId);
+            if (!entitas) {
+                return res.status(404).json({ error: 'Entity not found' });
             }
-            else {
-                res.status(404).json({ error: 'Entity not found' });
+            // Simpan data transaksi detail ke dalam array untuk proses batch
+            const transaksiKeuangan = yield TransaksiKeuangan_1.default.findAll({ where: { kode_entitas: entitasId } });
+            for (const data of transaksiKeuangan) {
+                yield TransaksiDetail_1.default.destroy({ where: { kode_transaksi: data.kode_transaksi } });
             }
+            yield TransaksiKeuangan_1.default.destroy({ where: { kode_entitas: entitasId } });
+            // Delete associated AkunKeuangan records in bulk
+            yield AkunKeuangan_1.default.destroy({ where: { kode_entitas: entitasId } });
+            yield entitas.destroy();
+            return res.status(200).json({ message: 'Entity deleted successfully' });
         }
         catch (error) {
-            res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
+        }
+    });
+}
+function getEntitasList(_req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const entitasList = yield Entitas_1.default.findAll();
+            return res.status(200).json(entitasList);
+        }
+        catch (error) {
+            return res.status(500).json({ error: error.message });
         }
     });
 }

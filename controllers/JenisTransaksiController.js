@@ -16,10 +16,11 @@ const JenisTransaksi_1 = __importDefault(require("../models/JenisTransaksi"));
 function createJenisTransaksi(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { kode_jenis_transaksi, nama_jenis_transaksi } = req.body;
+            const { kode_jenis_transaksi, nama_jenis_transaksi, tipe_transaksi } = req.body;
             const jenisTransaksi = yield JenisTransaksi_1.default.create({
                 kode_jenis_transaksi,
                 nama_jenis_transaksi,
+                tipe_transaksi,
             });
             res.status(201).json(jenisTransaksi);
         }

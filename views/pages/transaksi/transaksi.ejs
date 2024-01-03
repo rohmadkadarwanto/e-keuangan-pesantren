@@ -1,15 +1,33 @@
 <%- include('../../partials/header') %>
+<div class="content-wrapper" id="entitasList">
+  <div class="content-header">
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Data Transaksi Keuangan</h1>
+        </div>
+        <div class="col-sm-6">
+          <div class="float-sm-right">
+            <button class="btn btn-success" onclick="showNewTransaksiForm()">Tambah Transaksi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <div class="container mt-5">
-      <h2 class="mb-4">Data Transaksi Keuangan</h2>
-
+  <section class="content">
+    <div class="container">
       <!-- List Transaksi -->
       <div id="transaksiList" class="card">
+
         <div class="card-header">
-          <button class="btn btn-success" onclick="showNewTransaksiForm()">Tambah Transaksi</button>
+          <h3 class="card-title">
+            <i class="fas fa-users mr-1"></i>
+            Daftar Transaksi
+          </h3>
         </div>
         <div class="card-body">
-          <table class="table">
+          <table class="table table-responsive">
             <thead>
               <tr>
                 <th>Kode Transaksi</th>
@@ -30,7 +48,7 @@
       <!-- Create/Edit Form -->
       <div id="transaksiForm" style="display: none;" class="card">
         <div class="card-header">
-          <button class="btn btn-success" onclick="cancelTransaksiForm()">Kembali</button>
+          <h3 class="card-title"><i class="fas fa-kredit mr-1"></i>Data Transaksi</h3>
         </div>
         <div class="card-body">
           <form data-toggle="validator">
@@ -54,16 +72,9 @@
               <select class="form-control" id="kode_jenis_transaksi" name="kode_jenis_transaksi" required data-error="Pilih kode jenis transaksi"></select>
             </div>
 
-
-            <div class="form-group">
-              <label for="tipe_transaksi">Tipe Transaksi:</label>
-              <select class="form-control" id="tipe_transaksi" name="tipe_transaksi" required data-error="Pilih tipe transaksi">
-              </select>
-            </div>
-
             <div class="form-group">
               <label for="jumlah">Nominal:</label>
-              <input type="text" class="form-control" id="jumlah" name="jumlah" required>
+              <input type="number" class="form-control" id="jumlah" name="jumlah" required>
             </div>
             <div class="form-group">
               <label for="tanggal_transaksi">Tanggal Transaksi:</label>
@@ -77,6 +88,7 @@
             <input type="hidden" id="id_transaksi" name="id_transaksi">
 
             <button type="button" class="btn btn-primary" onclick="saveTransaksi()">Save</button>
+            <button type="button" class="btn btn-danger" onclick="cancelTransaksiForm()">Cencel</button>
           </form>
         </div>
       </div>
@@ -107,7 +119,8 @@
       </div>
     </div>
 
-
+  </section>
+</div>
 <script>
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -139,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-    populateTipeTransaksiDropdown();
+    //populateTipeTransaksiDropdown();
 
   }
 
@@ -155,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tipeEntitasOptions = [
         { value: "", text: "Pilih Jenis Transaksi", selected: true, disabled: true },
-        ...data.map(jenisTransaksi => ({ value: jenisTransaksi.kode_jenis_transaksi, text: jenisTransaksi.nama_jenis_transaksi }))
+        ...data.map(jenisTransaksi => ({ value: jenisTransaksi.kode_jenis_transaksi, text: jenisTransaksi.nama_jenis_transaksi + ` (${jenisTransaksi.tipe_transaksi})` }))
       ];
 
       // Tambahkan opsi baru dari data jenis transaksi
@@ -192,7 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const newOption = document.createElement("option");
       newOption.value = option.kode_akun;
       newOption.text = option.nama_akun + ' ('+getTipeTransaksiText(option.tipe_transaksi)+')';
-      dropdown.appendChild(newOption);
+      if(option.tipe_transaksi == 'debit') {
+        dropdown.appendChild(newOption);
+      }
     });
   }
 
@@ -226,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function resetTransaksiForm() {
-    const formElements = ['id_transaksi', 'kode_transaksi', 'kode_entitas', 'kode_jenis_transaksi', 'tanggal_transaksi', 'keterangan','jumlah','kode_akun','tipe_transaksi'];
+    const formElements = ['id_transaksi', 'kode_transaksi', 'kode_entitas', 'kode_jenis_transaksi', 'tanggal_transaksi', 'keterangan','jumlah','kode_akun'];
     formElements.forEach(element => {
       document.getElementById(element).value = '';
     });
@@ -322,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         keterangan: document.getElementById('keterangan').value,
         jumlah: document.getElementById('jumlah').value,
         kode_akun: document.getElementById('kode_akun').value,
-        tipe_transaksi: document.getElementById('tipe_transaksi').value,
+        //tipe_transaksi: document.getElementById('tipe_transaksi').value,
       };
 
       const transaksiId = document.getElementById('id_transaksi').value;
@@ -417,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('kode_entitas').addEventListener('change', fetchAkunKeuanganOptions(data.kode_entitas));
 
 
-    populateTipeTransaksiDropdown();
+    /*populateTipeTransaksiDropdown();
 
     const tipeTransaksiDropdown = document.getElementById('tipe_transaksi');
     for (let i = 0; i < tipeTransaksiDropdown.options.length; i++) {
@@ -425,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tipeTransaksiDropdown.options[i].selected = true;
         break;
       }
-    }
+    }*/
 
   }
 
